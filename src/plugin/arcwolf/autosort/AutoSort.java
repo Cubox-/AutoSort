@@ -114,7 +114,9 @@ public class AutoSort extends JavaPlugin {
 
         pm.registerEvents(asListener, this);
         scheduler.scheduleSyncRepeatingTask(this, new SortTask(this), 5L, 10L);
-        scheduler.scheduleSyncRepeatingTask(this, new CleanupTask(this), 12000L, 36000L);
+        scheduler.scheduleSyncRepeatingTask(this, new CleanupTask(this), 12000L,
+                getConfig().getLong("save-network-rate", 1800) * 20 // Converts time to seconds, defaults to 30 minutes.
+        );
     }
 
     public void onDisable() {
