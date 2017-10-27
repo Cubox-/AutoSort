@@ -24,9 +24,9 @@ import org.bukkit.event.player.PlayerLoginEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
-import plugin.arcwolf.autosort.Network.NetworkItem;
-import plugin.arcwolf.autosort.Network.SortChest;
-import plugin.arcwolf.autosort.Network.SortNetwork;
+import plugin.arcwolf.autosort.network.NetworkItem;
+import plugin.arcwolf.autosort.network.SortChest;
+import plugin.arcwolf.autosort.network.SortNetwork;
 
 import java.util.ArrayList;
 import java.util.List;

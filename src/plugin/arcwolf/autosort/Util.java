@@ -12,7 +12,7 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.Plugin;
-import plugin.arcwolf.autosort.Network.SortChest;
+import plugin.arcwolf.autosort.network.SortChest;
 
 import java.text.NumberFormat;
 import java.text.ParsePosition;

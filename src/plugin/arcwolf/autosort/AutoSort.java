@@ -20,11 +20,11 @@ import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitScheduler;
-import plugin.arcwolf.autosort.Network.NetworkItem;
-import plugin.arcwolf.autosort.Network.SortChest;
-import plugin.arcwolf.autosort.Network.SortNetwork;
-import plugin.arcwolf.autosort.Task.CleanupTask;
-import plugin.arcwolf.autosort.Task.SortTask;
+import plugin.arcwolf.autosort.network.NetworkItem;
+import plugin.arcwolf.autosort.network.SortChest;
+import plugin.arcwolf.autosort.network.SortNetwork;
+import plugin.arcwolf.autosort.task.CleanupTask;
+import plugin.arcwolf.autosort.task.SortTask;
 
 import java.io.File;
 import java.io.IOException;
