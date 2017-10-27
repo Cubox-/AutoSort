@@ -1,21 +1,11 @@
 package plugin.arcwolf.autosort;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.UUID;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
+import com.griefcraft.lwc.LWC;
+import com.griefcraft.lwc.LWCPlugin;
+import com.nijikokun.bukkit.Permissions.Permissions;
+import de.bananaco.bpermissions.api.ApiLayer;
+import de.bananaco.bpermissions.api.CalculableType;
 import net.milkbowl.vault.permission.Permission;
-
 import org.anjocaido.groupmanager.GroupManager;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -37,7 +27,6 @@ import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitScheduler;
-
 import plugin.arcwolf.autosort.Network.NetworkItem;
 import plugin.arcwolf.autosort.Network.SortChest;
 import plugin.arcwolf.autosort.Network.SortNetwork;
@@ -45,12 +34,15 @@ import plugin.arcwolf.autosort.Task.CleanupTask;
 import plugin.arcwolf.autosort.Task.SortTask;
 import ru.tehkode.permissions.bukkit.PermissionsEx;
 
-import com.griefcraft.lwc.LWC;
-import com.griefcraft.lwc.LWCPlugin;
-import com.nijikokun.bukkit.Permissions.Permissions;
-
-import de.bananaco.bpermissions.api.ApiLayer;
-import de.bananaco.bpermissions.api.CalculableType;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.util.*;
+import java.util.Map.Entry;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /*
  * Debug codes:
@@ -68,49 +60,45 @@ public class AutoSort extends JavaPlugin {
     public static boolean ONLINE_UUID_CHECK = true;
     public static int httpConnectTimeout = 15000;
     public static int httpReadTimeout = 15000;
-
+    public static ConcurrentHashMap<String, List<ItemStack>> customMatGroups = new ConcurrentHashMap<String, List<ItemStack>>();
+    public static Map<UUID, ProxExcep> proximities = new HashMap<UUID, ProxExcep>();
+    public static int defaultProx = 0;
+    public static boolean bkError = false;
+    public static boolean emptiesFirst = true;
+    public static boolean keepPriority = false;
+    private static int debug = 0;
     public List<Item> items = new ArrayList<Item>();
     public List<Item> stillItems = new ArrayList<Item>();
-
     public ConcurrentHashMap<Block, SortNetwork> allNetworkBlocks = new ConcurrentHashMap<Block, SortNetwork>();
     public ConcurrentHashMap<UUID, List<SortNetwork>> networks = new ConcurrentHashMap<UUID, List<SortNetwork>>();
     public Map<InventoryBlock, InventoryBlock> sortBlocks = new HashMap<InventoryBlock, InventoryBlock>();
     public Map<InventoryBlock, InventoryBlock> depositBlocks = new HashMap<InventoryBlock, InventoryBlock>();
     public Map<InventoryBlock, InventoryBlock> withdrawBlocks = new HashMap<InventoryBlock, InventoryBlock>();
-
-    public static ConcurrentHashMap<String, List<ItemStack>> customMatGroups = new ConcurrentHashMap<String, List<ItemStack>>();
-    public static Map<UUID, ProxExcep> proximities = new HashMap<UUID, ProxExcep>();
-    public static int defaultProx = 0;
-    public static boolean bkError = false;
     public boolean UUIDLoaded = false;
-    private boolean uuidprecache = false;
-
     public boolean worldRestrict = false;
-    public static boolean emptiesFirst = true;
-    public static boolean keepPriority = false;
-
+    public AutoSortListener asListener;
+    public Util util;
+    private boolean uuidprecache = false;
     private Server server;
     private BukkitScheduler scheduler;
     private PluginDescriptionFile pdfFile;
     private PluginManager pm;
     private String pluginName;
-
     private FileConfiguration customConfig = null;
     private File customConfigFile = null;
-    public AutoSortListener asListener;
     private CommandHandler commandHandler;
-    public Util util;
-
     private GroupManager groupManager;
     private net.milkbowl.vault.permission.Permission vaultPerms;
     private Permissions permissionsPlugin;
     private PermissionsEx permissionsExPlugin;
     private de.bananaco.bpermissions.imp.Permissions bPermissions;
     private LWC lwc;
-
     private boolean permissionsEr = false;
     private boolean permissionsSet = false;
-    private static int debug = 0;
+
+    public static int getDebug() {
+        return debug;
+    }
 
     public void onEnable() {
         server = this.getServer();
@@ -158,8 +146,7 @@ public class AutoSort extends JavaPlugin {
                 }
             });
             return true;
-        }
-        else {
+        } else {
             scheduler.runTaskAsynchronously(this, new Runnable() {
 
                 @Override
@@ -195,8 +182,7 @@ public class AutoSort extends JavaPlugin {
                 boolean permissions = player.hasPermission(permission);
                 LOGGER.info("Vault permissions, group for '" + pName + "' = " + gName);
                 LOGGER.info("Permission for " + permission + " is " + permissions);
-            }
-            else if (groupManager != null) {
+            } else if (groupManager != null) {
                 String pName = player.getName();
                 String gName = groupManager.getWorldsHolder().getWorldData(player.getWorld().getName()).getPermissionsHandler().getGroup(player.getName());
                 //Boolean permissions = groupManager.getWorldsHolder().getWorldPermissions(player).has(player, permission);
@@ -205,8 +191,7 @@ public class AutoSort extends JavaPlugin {
                 LOGGER.info("Permission for " + permission + " is " + permissions);
                 LOGGER.info("");
                 LOGGER.info("permissions available to '" + pName + "' = " + groupManager.getWorldsHolder().getWorldData(player.getWorld().getName()).getGroup(gName).getPermissionList());
-            }
-            else if (permissionsPlugin != null) {
+            } else if (permissionsPlugin != null) {
                 String pName = player.getName();
                 String wName = player.getWorld().getName();
                 String gName = Permissions.Security.getGroup(wName, pName);
@@ -214,40 +199,35 @@ public class AutoSort extends JavaPlugin {
                 boolean permissions = player.hasPermission(permission);
                 LOGGER.info("Niji permissions, group for '" + pName + "' = " + gName);
                 LOGGER.info("Permission for " + permission + " is " + permissions);
-            }
-            else if (permissionsExPlugin != null) {
+            } else if (permissionsExPlugin != null) {
                 String pName = player.getName();
                 String wName = player.getWorld().getName();
                 String[] gNameA = PermissionsEx.getUser(player).getGroupsNames(wName);
                 StringBuffer gName = new StringBuffer();
-                for(String groups : gNameA) {
+                for (String groups : gNameA) {
                     gName.append(groups + " ");
                 }
                 //Boolean permissions = PermissionsEx.getPermissionManager().has(player, permission);
                 boolean permissions = player.hasPermission(permission);
                 LOGGER.info("PermissionsEx permissions, group for '" + pName + "' = " + gName.toString());
                 LOGGER.info("Permission for " + permission + " is " + permissions);
-            }
-            else if (bPermissions != null) {
+            } else if (bPermissions != null) {
                 String pName = player.getName();
                 String wName = player.getWorld().getName();
                 String[] gNameA = ApiLayer.getGroups(wName, CalculableType.USER, pName);
                 StringBuffer gName = new StringBuffer();
-                for(String groups : gNameA) {
+                for (String groups : gNameA) {
                     gName.append(groups + " ");
                 }
                 //Boolean permissions = bPermissions.has(player, permission);
                 boolean permissions = player.hasPermission(permission);
                 LOGGER.info("bPermissions, group for '" + pName + "' = " + gName);
                 LOGGER.info("bPermission for " + permission + " is " + permissions);
-            }
-            else if (server.getPluginManager().getPlugin("PermissionsBukkit") != null) {
+            } else if (server.getPluginManager().getPlugin("PermissionsBukkit") != null) {
                 LOGGER.info("Bukkit Permissions " + permission + " " + player.hasPermission(permission));
-            }
-            else if (permissionsEr && (player.isOp() || player.hasPermission(permission))) {
+            } else if (permissionsEr && (player.isOp() || player.hasPermission(permission))) {
                 LOGGER.info("Unknown permissions plugin " + permission + " " + player.hasPermission(permission));
-            }
-            else {
+            } else {
                 LOGGER.info("Unknown permissions plugin " + permission + " " + player.hasPermission(permission));
             }
         }
@@ -263,46 +243,40 @@ public class AutoSort extends JavaPlugin {
                 permissionsSet = true;
             }
             vaultPerms = rsp.getProvider();
-        }
-        else if (server.getPluginManager().getPlugin("GroupManager") != null) {
+        } else if (server.getPluginManager().getPlugin("GroupManager") != null) {
             Plugin p = server.getPluginManager().getPlugin("GroupManager");
             if (!permissionsSet) {
                 LOGGER.info(pluginName + ": GroupManager detected, permissions enabled...");
                 permissionsSet = true;
             }
             groupManager = (GroupManager) p;
-        }
-        else if (server.getPluginManager().getPlugin("Permissions") != null) {
+        } else if (server.getPluginManager().getPlugin("Permissions") != null) {
             Plugin p = server.getPluginManager().getPlugin("Permissions");
             if (!permissionsSet) {
                 LOGGER.info(pluginName + ": Permissions detected, permissions enabled...");
                 permissionsSet = true;
             }
             permissionsPlugin = (Permissions) p;
-        }
-        else if (server.getPluginManager().getPlugin("PermissionsBukkit") != null) {
+        } else if (server.getPluginManager().getPlugin("PermissionsBukkit") != null) {
             if (!permissionsSet) {
                 LOGGER.info(pluginName + ": Bukkit permissions detected, permissions enabled...");
                 permissionsSet = true;
             }
-        }
-        else if (server.getPluginManager().getPlugin("PermissionsEx") != null) {
+        } else if (server.getPluginManager().getPlugin("PermissionsEx") != null) {
             Plugin p = server.getPluginManager().getPlugin("PermissionsEx");
             if (!permissionsSet) {
                 LOGGER.info(pluginName + ": PermissionsEx detected, permissions enabled...");
                 permissionsSet = true;
             }
             permissionsExPlugin = (PermissionsEx) p;
-        }
-        else if (server.getPluginManager().getPlugin("bPermissions") != null) {
+        } else if (server.getPluginManager().getPlugin("bPermissions") != null) {
             Plugin p = server.getPluginManager().getPlugin("bPermissions");
             if (!permissionsSet) {
                 LOGGER.info(pluginName + ": bPermissions detected, permissions enabled...");
                 permissionsSet = true;
             }
             bPermissions = (de.bananaco.bpermissions.imp.Permissions) p;
-        }
-        else {
+        } else {
             if (!permissionsEr) {
                 LOGGER.info(pluginName + ": Unknown permissions detected, Using Generic Permissions...");
                 permissionsEr = true;
@@ -329,9 +303,9 @@ public class AutoSort extends JavaPlugin {
             defaultProx = getConfig().getInt("proximity", 0);
             keepPriority = getConfig().getBoolean("keep-priority-sorted", false);
             ConfigurationSection proxSec = getConfig().getConfigurationSection("proximity-exceptions");
-            for(String owner : proxSec.getKeys(false)) {
+            for (String owner : proxSec.getKeys(false)) {
                 ConfigurationSection username = proxSec.getConfigurationSection(owner);
-                for(String network : username.getKeys(false)) {
+                for (String network : username.getKeys(false)) {
                     UUID pId = UUID.fromString(owner);
                     proximities.put(pId, new ProxExcep(pId, network, username.getInt(network)));
                 }
@@ -346,10 +320,10 @@ public class AutoSort extends JavaPlugin {
         refreshInternalConfig();
         ConfigurationSection groupSec = getConfig().getConfigurationSection("customGroups");
         Map<String, Object> groups = groupSec.getValues(false);
-        for(String key : groups.keySet()) {
+        for (String key : groups.keySet()) {
             List<String> idList = groupSec.getStringList(key);
             List<ItemStack> matList = new ArrayList<ItemStack>();
-            for(String id : idList) {
+            for (String id : idList) {
                 ItemStack is = Util.parseMaterialID(id);
                 matList.add(is);
             }
@@ -357,7 +331,7 @@ public class AutoSort extends JavaPlugin {
         }
     }
 
-    public void refreshInternalConfig(){
+    public void refreshInternalConfig() {
         try {
             getConfig().load(new File(this.getDataFolder(), "config.yml"));
         } catch (Exception e) {
@@ -365,23 +339,22 @@ public class AutoSort extends JavaPlugin {
             LOGGER.warning(pluginName + ": If that does not work, delete the config and try again.");
         }
     }
-    
+
     public void loadInventoryBlocks() {
         refreshInternalConfig();
         ConfigurationSection ibSec = getConfig().getConfigurationSection("inventoryBlocks");
         Map<String, Object> sortType = ibSec.getValues(false);
-        for(String key : sortType.keySet()) {
+        for (String key : sortType.keySet()) {
             List<String> idList = ibSec.getStringList(key);
             Map<InventoryBlock, InventoryBlock> ivb;
             if (key.toUpperCase().equals("DEPOSIT"))
                 ivb = depositBlocks;
             else if (key.toUpperCase().equals("WITHDRAW")) {
                 ivb = withdrawBlocks;
-            }
-            else {
+            } else {
                 ivb = sortBlocks;
             }
-            for(String id : idList) {
+            for (String id : idList) {
                 String[] split = id.split(":");
                 if (split.length > 1) {
                     try {
@@ -391,8 +364,7 @@ public class AutoSort extends JavaPlugin {
                         AutoSort.LOGGER.warning("Error Parsing Inventory Block in " + key + " group. ID found was: " + split[0] + " " + split[1]);
                         continue;
                     }
-                }
-                else {
+                } else {
                     try {
                         InventoryBlock ib = new InventoryBlock(Integer.parseInt(id));
                         ivb.put(ib, ib);
@@ -404,11 +376,11 @@ public class AutoSort extends JavaPlugin {
             }
         }
     }
-    
+
     private Map<String, UUID> getDatabaseUUIDs() {
         Map<String, UUID> namesToUUID = new HashMap<String, UUID>();
         ConfigurationSection netsSec = getCustomConfig().getConfigurationSection("Owners");
-        for(String owner : netsSec.getKeys(false)) {
+        for (String owner : netsSec.getKeys(false)) {
             ConfigurationSection netSec = netsSec.getConfigurationSection(owner);
             ConfigurationSection newnet = netSec.getConfigurationSection("NetworkNames");
             UUID ownerId = namesToUUID.get(owner);
@@ -420,11 +392,11 @@ public class AutoSort extends JavaPlugin {
                 }
                 namesToUUID.put(owner, ownerId);
             }
-            for(String netNameSec : newnet.getKeys(false)) {
+            for (String netNameSec : newnet.getKeys(false)) {
                 ConfigurationSection network = newnet.getConfigurationSection(netNameSec);
                 SortNetwork net = new SortNetwork(ownerId, netNameSec, "");
                 List<String> memberNames = network.getStringList("Members");
-                for(String name : memberNames) {
+                for (String name : memberNames) {
                     UUID memberId = namesToUUID.get(name);
                     if (memberId == null) {
                         memberId = FindUUID.getUUIDFromPlayerName(name);
@@ -460,19 +432,19 @@ public class AutoSort extends JavaPlugin {
                 public void run() {
                     if (uuidprecache) {
                         ConfigurationSection netsSec = getCustomConfig().getConfigurationSection("Owners");
-                        for(String owner : netsSec.getKeys(false)) {
+                        for (String owner : netsSec.getKeys(false)) {
                             ConfigurationSection netSec = netsSec.getConfigurationSection(owner);
                             ConfigurationSection newnet = netSec.getConfigurationSection("NetworkNames");
                             UUID ownerId = namesToUUID.get(owner);
                             if (ownerId == null) {
                                 continue;
                             }
-                            for(String netNameSec : newnet.getKeys(false)) {
+                            for (String netNameSec : newnet.getKeys(false)) {
                                 ConfigurationSection network = newnet.getConfigurationSection(netNameSec);
                                 SortNetwork net = new SortNetwork(ownerId, netNameSec, "");
                                 List<String> memberNames = network.getStringList("Members");
                                 List<UUID> memberUUIDs = new ArrayList<UUID>();
-                                for(String name : memberNames) {
+                                for (String name : memberNames) {
                                     UUID memberId = namesToUUID.get(name);
                                     if (memberId == null) {
                                         continue;
@@ -481,7 +453,7 @@ public class AutoSort extends JavaPlugin {
                                 }
                                 net.members = memberUUIDs;
                                 ConfigurationSection chests = network.getConfigurationSection("Chests");
-                                for(String chestLocStr : chests.getKeys(false)) {
+                                for (String chestLocStr : chests.getKeys(false)) {
                                     ConfigurationSection cSec = chests.getConfigurationSection(chestLocStr);
                                     String[] chestData = chestLocStr.split(",");
                                     World world = getServer().getWorld(chestData[0].replace("(dot)", "."));
@@ -509,26 +481,23 @@ public class AutoSort extends JavaPlugin {
                                             allNetworkBlocks.put(chest, net);
                                             allNetworkBlocks.put(util.doubleChest(chest), net);
                                             allNetworkBlocks.put(sign, net);
-                                        }
-                                        else {
+                                        } else {
                                             LOGGER.warning(pluginName + ": SortChest Sign Didnt exist at " + signLoc.getBlockX() + "," + signLoc.getBlockY() + "," + signLoc.getBlockZ() + ":" + signLoc.getWorld().getName());
                                         }
-                                    }
-                                    else {
+                                    } else {
                                         LOGGER.warning(pluginName + ": Null world: " + chestData[0] + " . Does this world still exist?");
                                     }
                                 }
                                 if (networks.containsKey(ownerId)) {
                                     networks.get(ownerId).add(net);
-                                }
-                                else {
+                                } else {
                                     List<SortNetwork> nets = new ArrayList<SortNetwork>();
                                     nets.add(net);
                                     networks.put(ownerId, nets);
                                 }
                                 try {
                                     ConfigurationSection depChest = network.getConfigurationSection("DepositChests");
-                                    for(String depChestLocStr : depChest.getKeys(false)) {
+                                    for (String depChestLocStr : depChest.getKeys(false)) {
                                         ConfigurationSection dSec = depChest.getConfigurationSection(depChestLocStr);
                                         String[] depChestData = depChestLocStr.split(",");
                                         World world = getServer().getWorld(depChestData[0].replace("(dot)", "."));
@@ -550,12 +519,10 @@ public class AutoSort extends JavaPlugin {
                                                 allNetworkBlocks.put(chest, net);
                                                 allNetworkBlocks.put(util.doubleChest(chest), net);
                                                 allNetworkBlocks.put(sign, net);
-                                            }
-                                            else {
+                                            } else {
                                                 LOGGER.warning(pluginName + ": SortChest Sign Didnt exist at " + signLoc.getBlockX() + "," + signLoc.getBlockY() + "," + signLoc.getBlockZ() + ":" + signLoc.getWorld().getName());
                                             }
-                                        }
-                                        else {
+                                        } else {
                                             LOGGER.warning(pluginName + ": Null world: " + depChestData[0] + " . Does this world still exist?");
                                         }
                                     }
@@ -566,7 +533,7 @@ public class AutoSort extends JavaPlugin {
 
                                 try {
                                     ConfigurationSection wdChest = network.getConfigurationSection("WithdrawChests");
-                                    for(String wdChestLocStr : wdChest.getKeys(false)) {
+                                    for (String wdChestLocStr : wdChest.getKeys(false)) {
                                         ConfigurationSection dSec = wdChest.getConfigurationSection(wdChestLocStr);
                                         String[] wdChestData = wdChestLocStr.split(",");
                                         World world = getServer().getWorld(wdChestData[0].replace("(dot)", "."));
@@ -587,12 +554,10 @@ public class AutoSort extends JavaPlugin {
                                                 allNetworkBlocks.put(chest, net);
                                                 allNetworkBlocks.put(util.doubleChest(chest), net);
                                                 allNetworkBlocks.put(sign, net);
-                                            }
-                                            else {
+                                            } else {
                                                 LOGGER.warning(pluginName + ": SortChest Sign Didnt exist at " + signLoc.getBlockX() + "," + signLoc.getBlockY() + "," + signLoc.getBlockZ() + ":" + signLoc.getWorld().getName());
                                             }
-                                        }
-                                        else {
+                                        } else {
                                             LOGGER.warning(pluginName + ": Null world: " + wdChestData[0] + " . Does this world still exist?");
                                         }
                                     }
@@ -603,7 +568,7 @@ public class AutoSort extends JavaPlugin {
 
                                 try {
                                     ConfigurationSection dSign = network.getConfigurationSection("DropSigns");
-                                    for(String dSignLocStr : dSign.getKeys(false)) {
+                                    for (String dSignLocStr : dSign.getKeys(false)) {
                                         String[] dSignData = dSignLocStr.split(",");
                                         World world = getServer().getWorld(dSignData[0].replace("(dot)", "."));
                                         if (world != null) {
@@ -616,12 +581,10 @@ public class AutoSort extends JavaPlugin {
                                                 NetworkItem netItem = new NetworkItem(net, null, sign);
                                                 net.dropSigns.put(sign, netItem);
                                                 allNetworkBlocks.put(sign, net);
-                                            }
-                                            else {
+                                            } else {
                                                 LOGGER.warning(pluginName + ": Drop Sign Didnt exist at " + dSignLoc.getBlockX() + "," + dSignLoc.getBlockY() + "," + dSignLoc.getBlockZ() + ":" + dSignLoc.getWorld().getName());
                                             }
-                                        }
-                                        else {
+                                        } else {
                                             LOGGER.warning(pluginName + ": Null world: " + dSignData[0] + " . Does this world still exist?");
                                         }
                                     }
@@ -639,25 +602,24 @@ public class AutoSort extends JavaPlugin {
                 }
 
             }, 20, 20);
-        }
-        else if (version == 6) {
+        } else if (version == 6) {
             ConfigurationSection netsSec = getCustomConfig().getConfigurationSection("Owners");
-            for(String owner : netsSec.getKeys(false)) {
+            for (String owner : netsSec.getKeys(false)) {
                 ConfigurationSection netSec = netsSec.getConfigurationSection(owner);
                 ConfigurationSection newnet = netSec.getConfigurationSection("NetworkNames");
                 UUID ownerId = UUID.fromString(owner);
-                for(String netNameSec : newnet.getKeys(false)) {
+                for (String netNameSec : newnet.getKeys(false)) {
                     ConfigurationSection network = newnet.getConfigurationSection(netNameSec);
                     SortNetwork net = new SortNetwork(ownerId, netNameSec, "");
                     List<String> memberUUIDStrings = network.getStringList("Members");
                     List<UUID> memberUUIDs = new ArrayList<UUID>();
-                    for(String uuidString : memberUUIDStrings) {
+                    for (String uuidString : memberUUIDStrings) {
                         UUID memberId = UUID.fromString(uuidString);
                         memberUUIDs.add(memberId);
                     }
                     net.members = memberUUIDs;
                     ConfigurationSection chests = network.getConfigurationSection("Chests");
-                    for(String chestLocStr : chests.getKeys(false)) {
+                    for (String chestLocStr : chests.getKeys(false)) {
                         ConfigurationSection cSec = chests.getConfigurationSection(chestLocStr);
                         String[] chestData = chestLocStr.split(",");
                         World world = getServer().getWorld(chestData[0].replace("(dot)", "."));
@@ -685,26 +647,23 @@ public class AutoSort extends JavaPlugin {
                                 allNetworkBlocks.put(chest, net);
                                 allNetworkBlocks.put(util.doubleChest(chest), net);
                                 allNetworkBlocks.put(sign, net);
-                            }
-                            else {
+                            } else {
                                 LOGGER.warning(pluginName + ": SortChest Sign Didnt exist at " + signLoc.getBlockX() + "," + signLoc.getBlockY() + "," + signLoc.getBlockZ() + ":" + signLoc.getWorld().getName());
                             }
-                        }
-                        else {
+                        } else {
                             LOGGER.warning(pluginName + ": Null world: " + chestData[0] + " . Does this world still exist?");
                         }
                     }
                     if (networks.containsKey(ownerId)) {
                         networks.get(ownerId).add(net);
-                    }
-                    else {
+                    } else {
                         List<SortNetwork> nets = new ArrayList<SortNetwork>();
                         nets.add(net);
                         networks.put(ownerId, nets);
                     }
                     try {
                         ConfigurationSection depChest = network.getConfigurationSection("DepositChests");
-                        for(String depChestLocStr : depChest.getKeys(false)) {
+                        for (String depChestLocStr : depChest.getKeys(false)) {
                             ConfigurationSection dSec = depChest.getConfigurationSection(depChestLocStr);
                             String[] depChestData = depChestLocStr.split(",");
                             World world = getServer().getWorld(depChestData[0].replace("(dot)", "."));
@@ -726,12 +685,10 @@ public class AutoSort extends JavaPlugin {
                                     allNetworkBlocks.put(chest, net);
                                     allNetworkBlocks.put(util.doubleChest(chest), net);
                                     allNetworkBlocks.put(sign, net);
-                                }
-                                else {
+                                } else {
                                     LOGGER.warning(pluginName + ": SortChest Sign Didnt exist at " + signLoc.getBlockX() + "," + signLoc.getBlockY() + "," + signLoc.getBlockZ() + ":" + signLoc.getWorld().getName());
                                 }
-                            }
-                            else {
+                            } else {
                                 LOGGER.warning(pluginName + ": Null world: " + depChestData[0] + " . Does this world still exist?");
                             }
                         }
@@ -742,7 +699,7 @@ public class AutoSort extends JavaPlugin {
 
                     try {
                         ConfigurationSection wdChest = network.getConfigurationSection("WithdrawChests");
-                        for(String wdChestLocStr : wdChest.getKeys(false)) {
+                        for (String wdChestLocStr : wdChest.getKeys(false)) {
                             ConfigurationSection dSec = wdChest.getConfigurationSection(wdChestLocStr);
                             String[] wdChestData = wdChestLocStr.split(",");
                             World world = getServer().getWorld(wdChestData[0].replace("(dot)", "."));
@@ -763,12 +720,10 @@ public class AutoSort extends JavaPlugin {
                                     allNetworkBlocks.put(chest, net);
                                     allNetworkBlocks.put(util.doubleChest(chest), net);
                                     allNetworkBlocks.put(sign, net);
-                                }
-                                else {
+                                } else {
                                     LOGGER.warning(pluginName + ": SortChest Sign Didnt exist at " + signLoc.getBlockX() + "," + signLoc.getBlockY() + "," + signLoc.getBlockZ() + ":" + signLoc.getWorld().getName());
                                 }
-                            }
-                            else {
+                            } else {
                                 LOGGER.warning(pluginName + ": Null world: " + wdChestData[0] + " . Does this world still exist?");
                             }
                         }
@@ -779,7 +734,7 @@ public class AutoSort extends JavaPlugin {
 
                     try {
                         ConfigurationSection dSign = network.getConfigurationSection("DropSigns");
-                        for(String dSignLocStr : dSign.getKeys(false)) {
+                        for (String dSignLocStr : dSign.getKeys(false)) {
                             String[] dSignData = dSignLocStr.split(",");
                             World world = getServer().getWorld(dSignData[0].replace("(dot)", "."));
                             if (world != null) {
@@ -792,12 +747,10 @@ public class AutoSort extends JavaPlugin {
                                     NetworkItem netItem = new NetworkItem(net, null, sign);
                                     net.dropSigns.put(sign, netItem);
                                     allNetworkBlocks.put(sign, net);
-                                }
-                                else {
+                                } else {
                                     LOGGER.warning(pluginName + ": Drop Sign Didnt exist at " + dSignLoc.getBlockX() + "," + dSignLoc.getBlockY() + "," + dSignLoc.getBlockZ() + ":" + dSignLoc.getWorld().getName());
                                 }
-                            }
-                            else {
+                            } else {
                                 LOGGER.warning(pluginName + ": Null world: " + dSignData[0] + " . Does this world still exist?");
                             }
                         }
@@ -816,14 +769,14 @@ public class AutoSort extends JavaPlugin {
         List<SortNetwork> removedNets = new ArrayList<SortNetwork>();
         List<UUID> players = new ArrayList<UUID>();
         boolean somethingCleaned = false;
-        for(Entry<Block, SortNetwork> networkObject : allNetworkBlocks.entrySet()) {
+        for (Entry<Block, SortNetwork> networkObject : allNetworkBlocks.entrySet()) {
             SortNetwork network = networkObject.getValue();
             List<Block> removeDepositChests = new ArrayList<Block>();
             List<Block> removeDropSigns = new ArrayList<Block>();
             List<Block> removeWithdrawChests = new ArrayList<Block>();
             List<SortChest> removedChests = new ArrayList<SortChest>();
 
-            for(NetworkItem netItem : network.depositChests.values()) {
+            for (NetworkItem netItem : network.depositChests.values()) {
                 boolean chestChunkLoaded = false;
                 boolean signChunkLoaded = false;
                 Block chest = netItem.chest.getLocation().getBlock();
@@ -836,8 +789,7 @@ public class AutoSort extends JavaPlugin {
                     removeNetMapBlock.add(sign);
                     somethingCleaned = true;
                     LOGGER.info(pluginName + ": Chest at " + chest.getWorld().getName() + "," + chest.getLocation().getX() + "," + chest.getLocation().getY() + "," + chest.getLocation().getZ() + " in network " + netItem.network.netName + " removed (Not a chest block).");
-                }
-                else if (sign.getChunk().isLoaded() && !sign.getType().equals(Material.WALL_SIGN)) {
+                } else if (sign.getChunk().isLoaded() && !sign.getType().equals(Material.WALL_SIGN)) {
                     removeDepositChests.add(chest);
                     removeNetMapBlock.add(chest);
                     removeNetMapBlock.add(sign);
@@ -848,10 +800,10 @@ public class AutoSort extends JavaPlugin {
                 if (signChunkLoaded) sign.getChunk().unload();
             }
 
-            for(Block chest : removeDepositChests)
+            for (Block chest : removeDepositChests)
                 network.depositChests.remove(chest);
 
-            for(NetworkItem netItem : network.dropSigns.values()) {
+            for (NetworkItem netItem : network.dropSigns.values()) {
                 Block sign = netItem.sign.getLocation().getBlock();
                 boolean signChunkLoaded = false;
                 if (!sign.getChunk().isLoaded()) signChunkLoaded = sign.getChunk().load();
@@ -864,10 +816,10 @@ public class AutoSort extends JavaPlugin {
                 if (signChunkLoaded) sign.getChunk().unload();
             }
 
-            for(Block sign : removeDropSigns)
+            for (Block sign : removeDropSigns)
                 network.dropSigns.remove(sign);
 
-            for(NetworkItem netItem : network.withdrawChests.values()) {
+            for (NetworkItem netItem : network.withdrawChests.values()) {
                 boolean chestChunkLoaded = false;
                 boolean signChunkLoaded = false;
                 Block chest = netItem.chest.getLocation().getBlock();
@@ -880,8 +832,7 @@ public class AutoSort extends JavaPlugin {
                     removeNetMapBlock.add(sign);
                     somethingCleaned = true;
                     LOGGER.info(pluginName + ": Chest at " + chest.getWorld().getName() + "," + chest.getLocation().getX() + "," + chest.getLocation().getY() + "," + chest.getLocation().getZ() + " in network " + netItem.network.netName + " removed (Not a chest block).");
-                }
-                else if (sign.getChunk().isLoaded() && !sign.getType().equals(Material.WALL_SIGN)) {
+                } else if (sign.getChunk().isLoaded() && !sign.getType().equals(Material.WALL_SIGN)) {
                     removeWithdrawChests.add(chest);
                     removeNetMapBlock.add(chest);
                     removeNetMapBlock.add(sign);
@@ -892,10 +843,10 @@ public class AutoSort extends JavaPlugin {
                 if (signChunkLoaded) sign.getChunk().unload();
             }
 
-            for(Block chest : removeWithdrawChests)
+            for (Block chest : removeWithdrawChests)
                 network.withdrawChests.remove(chest);
 
-            for(SortChest sortChest : network.sortChests) {
+            for (SortChest sortChest : network.sortChests) {
                 boolean chestChunkLoaded = false;
                 boolean signChunkLoaded = false;
                 Block chest = sortChest.block.getLocation().getBlock();
@@ -909,16 +860,14 @@ public class AutoSort extends JavaPlugin {
                             somethingCleaned = true;
                             LOGGER.info(pluginName + ": Chest at " + chest.getWorld().getName() + "," + chest.getX() + "," + chest.getY() + "," + chest.getZ() + " in network " + network.netName + " removed (No sort sign).");
                         }
-                    }
-                    else {
+                    } else {
                         removedChests.add(sortChest);
                         removeNetMapBlock.add(chest);
                         removeNetMapBlock.add(sign);
                         somethingCleaned = true;
                         LOGGER.info(pluginName + ": Chest at " + chest.getWorld().getName() + "," + chest.getX() + "," + chest.getY() + "," + chest.getZ() + " in network " + network.netName + " removed (No sort sign).");
                     }
-                }
-                else if (sortChest.block.getChunk().isLoaded() && !util.isValidInventoryBlock(chest)) {
+                } else if (sortChest.block.getChunk().isLoaded() && !util.isValidInventoryBlock(chest)) {
                     removedChests.add(sortChest);
                     removeNetMapBlock.add(chest);
                     removeNetMapBlock.add(sign);
@@ -928,29 +877,29 @@ public class AutoSort extends JavaPlugin {
                 if (chestChunkLoaded) chest.getChunk().unload();
                 if (signChunkLoaded) sign.getChunk().unload();
             }
-            for(SortChest chest : removedChests) {
+            for (SortChest chest : removedChests) {
                 network.sortChests.remove(chest);
             }
         }
 
-        for(Entry<UUID, List<SortNetwork>> nets : networks.entrySet())
-            for(SortNetwork network : nets.getValue())
+        for (Entry<UUID, List<SortNetwork>> nets : networks.entrySet())
+            for (SortNetwork network : nets.getValue())
                 if (network.sortChests.size() == 0 && network.depositChests.size() == 0 && network.depositChests.size() == 0 && network.dropSigns.size() == 0) {
                     removedNets.add(network);
                     somethingCleaned = true;
                     LOGGER.info(pluginName + ": Network " + network.netName + " removed (Empty Network).");
                 }
 
-        for(SortNetwork netName : removedNets)
+        for (SortNetwork netName : removedNets)
             networks.get(netName.owner).remove(netName);
 
-        for(Block block : removeNetMapBlock)
+        for (Block block : removeNetMapBlock)
             allNetworkBlocks.remove(block);
 
-        for(Entry<UUID, List<SortNetwork>> nets : networks.entrySet())
+        for (Entry<UUID, List<SortNetwork>> nets : networks.entrySet())
             if (nets.getValue().size() == 0) players.add(nets.getKey());
 
-        for(UUID player : players) {
+        for (UUID player : players) {
             networks.remove(player);
             somethingCleaned = true;
             LOGGER.info(pluginName + ": Player UUID: " + player + " removed from database, No active networks.");
@@ -965,25 +914,25 @@ public class AutoSort extends JavaPlugin {
 
         // Save Owners
         ConfigurationSection netsSec = getCustomConfig().createSection("Owners");
-        for(Entry<UUID, List<SortNetwork>> nets : networks.entrySet()) {
+        for (Entry<UUID, List<SortNetwork>> nets : networks.entrySet()) {
             UUID key = nets.getKey();
 
             // Save Networks
             ConfigurationSection owners = netsSec.createSection(key.toString());
             ConfigurationSection newnet = owners.createSection("NetworkNames");
-            for(SortNetwork net : nets.getValue()) {
+            for (SortNetwork net : nets.getValue()) {
 
                 // Save Members
                 ConfigurationSection netnames = newnet.createSection(net.netName);
                 List<String> UUIDStrings = new ArrayList<String>();
-                for(UUID id : net.members) {
+                for (UUID id : net.members) {
                     UUIDStrings.add(id.toString());
                 }
                 netnames.set("Members", UUIDStrings);
 
                 // Save Sort Chests
                 ConfigurationSection chestSec = netnames.createSection("Chests");
-                for(SortChest chest : net.sortChests) {
+                for (SortChest chest : net.sortChests) {
                     Location loc = chest.block.getLocation();
                     String locStr = loc.getWorld().getName().replace(".", "(dot)") + "," + loc.getBlockX() + "," + loc.getBlockY() + "," + loc.getBlockZ();
                     ConfigurationSection cSec = chestSec.createSection(locStr);
@@ -997,7 +946,7 @@ public class AutoSort extends JavaPlugin {
 
                 // Save Deposit Chests
                 ConfigurationSection depChestSec = netnames.createSection("DepositChests");
-                for(Entry<Block, NetworkItem> depChest : net.depositChests.entrySet()) {
+                for (Entry<Block, NetworkItem> depChest : net.depositChests.entrySet()) {
                     if (depChest.getValue().network.owner.equals(key) && depChest.getValue().network.netName.equals(net.netName)) {
                         Location depLoc = depChest.getKey().getLocation();
                         Location depSignLoc = depChest.getValue().sign.getLocation();
@@ -1010,7 +959,7 @@ public class AutoSort extends JavaPlugin {
 
                 // Save WithdrawChests
                 ConfigurationSection wdChestSec = netnames.createSection("WithdrawChests");
-                for(Entry<Block, NetworkItem> wdChest : net.withdrawChests.entrySet()) {
+                for (Entry<Block, NetworkItem> wdChest : net.withdrawChests.entrySet()) {
                     if (wdChest.getValue().network.owner.equals(key) && wdChest.getValue().network.netName.equals(net.netName)) {
                         Location wdLoc = wdChest.getKey().getLocation();
                         Location wdSignLoc = wdChest.getValue().sign.getLocation();
@@ -1023,7 +972,7 @@ public class AutoSort extends JavaPlugin {
 
                 // Save Drop Signs
                 ConfigurationSection dSignSec = netnames.createSection("DropSigns");
-                for(Entry<Block, NetworkItem> dSign : net.dropSigns.entrySet()) {
+                for (Entry<Block, NetworkItem> dSign : net.dropSigns.entrySet()) {
                     if (dSign.getValue().network.owner.equals(key) && dSign.getValue().network.netName.equals(net.netName)) {
                         Location dSignLoc = dSign.getKey().getLocation();
                         String locString = dSignLoc.getWorld().getName().replace(".", "(dot)") + "," + dSignLoc.getBlockX() + "," + dSignLoc.getBlockY() + "," + dSignLoc.getBlockZ();
@@ -1058,7 +1007,9 @@ public class AutoSort extends JavaPlugin {
     }
 
     public void saveCustomConfig() {
-        if (customConfig == null || customConfigFile == null) { return; }
+        if (customConfig == null || customConfigFile == null) {
+            return;
+        }
         try {
             customConfig.save(customConfigFile);
         } catch (IOException ex) {
@@ -1071,7 +1022,7 @@ public class AutoSort extends JavaPlugin {
         if (!networks.containsKey(owner)) return null;
         List<SortNetwork> netList = networks.get(owner);
         SortNetwork net = null;
-        for(SortNetwork sn : netList) {
+        for (SortNetwork sn : netList) {
             if (sn.owner.equals(owner) && sn.netName.equals(netName)) {
                 net = sn;
                 break;
@@ -1085,23 +1036,18 @@ public class AutoSort extends JavaPlugin {
             SortNetwork network = allNetworkBlocks.get(signBlock);
             Sign sign = (Sign) signBlock.getState();
             if (sign.getLine(0).startsWith("*")) {
-                for(NetworkItem ni : network.dropSigns.values()) {
+                for (NetworkItem ni : network.dropSigns.values()) {
                     if (ni.sign.equals(signBlock)) return ni;
                 }
-                for(NetworkItem ni : network.depositChests.values()) {
+                for (NetworkItem ni : network.depositChests.values()) {
                     if (ni.sign.equals(signBlock)) return ni;
                 }
-            }
-            else if (sign.getLine(0).startsWith("#")) {
-                for(NetworkItem ni : network.withdrawChests.values()) {
+            } else if (sign.getLine(0).startsWith("#")) {
+                for (NetworkItem ni : network.withdrawChests.values()) {
                     if (ni.sign.equals(signBlock)) return ni;
                 }
             }
         }
         return null;
-    }
-
-    public static int getDebug() {
-        return debug;
     }
 }

@@ -1,15 +1,8 @@
 package plugin.arcwolf.autosort;
 
-import java.text.NumberFormat;
-import java.text.ParsePosition;
-import java.util.Map;
-import java.util.UUID;
-
-import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
-import org.bukkit.Location;
-import org.bukkit.Material;
-import org.bukkit.OfflinePlayer;
+import com.bergerkiller.bukkit.common.conversion.Conversion;
+import com.bergerkiller.bukkit.common.reflection.classes.TileEntityRef;
+import org.bukkit.*;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.BlockState;
@@ -19,11 +12,12 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.Plugin;
-
 import plugin.arcwolf.autosort.Network.SortChest;
 
-import com.bergerkiller.bukkit.common.conversion.Conversion;
-import com.bergerkiller.bukkit.common.reflection.classes.TileEntityRef;
+import java.text.NumberFormat;
+import java.text.ParsePosition;
+import java.util.Map;
+import java.util.UUID;
 
 public class Util {
 
@@ -41,74 +35,16 @@ public class Util {
 
     /**
      * Will find the exact player and is case sensitive
-     * 
-     * @param name
-     *            - The players name
+     *
+     * @param name - The players name
      * @return Player object or null if not found
      */
     @SuppressWarnings("deprecation")
     public static Player getPlayer(String name) {
-        for(Player test : Bukkit.matchPlayer(name)) {
+        for (Player test : Bukkit.matchPlayer(name)) {
             if (test.getName().equals(name)) return test;
         }
         return null;
-    }
-
-    public boolean isValidInventoryBlock(Block block) {
-        return isValidInventoryBlock(null, block, false);
-    }
-
-    public boolean isValidInventoryBlock(Player player, Block block, Boolean isEventCheck) {
-        int blockId = block.getTypeId();
-        int blockData = block.getData();
-        if (plugin.sortBlocks.containsKey(new InventoryBlock(blockId, blockData))) {
-            return true;
-        }
-        else if (plugin.sortBlocks.containsKey(new InventoryBlock(blockId))) {
-            return true;
-        }
-        else {
-            if (isEventCheck) player.sendMessage(ChatColor.RED + "That's not a recognized inventory block!");
-            return false;
-        }
-    }
-
-    public boolean isValidDepositBlock(Block block) {
-        return isValidDepositBlock(null, block, false);
-    }
-
-    public boolean isValidDepositBlock(Player player, Block block, Boolean isEventCheck) {
-        int blockId = block.getTypeId();
-        int blockData = block.getData();
-        if (plugin.depositBlocks.containsKey(new InventoryBlock(blockId, blockData))) {
-            return true;
-        }
-        else if (plugin.depositBlocks.containsKey(new InventoryBlock(blockId))) {
-            return true;
-        }
-        else {
-            if (isEventCheck) player.sendMessage(ChatColor.RED + "That's not a recognized inventory block!");
-            return false;
-        }
-    }
-
-    public boolean isValidWithdrawBlock(Block block) {
-        return isValidWithdrawBlock(null, block, false);
-    }
-
-    public boolean isValidWithdrawBlock(Player player, Block block, Boolean isEventCheck) {
-        int blockId = block.getTypeId();
-        int blockData = block.getData();
-        if (plugin.withdrawBlocks.containsKey(new InventoryBlock(blockId, blockData))) {
-            return true;
-        }
-        else if (plugin.withdrawBlocks.containsKey(new InventoryBlock(blockId))) {
-            return true;
-        }
-        else {
-            if (isEventCheck) player.sendMessage(ChatColor.RED + "That's not a recognized inventory block!");
-            return false;
-        }
     }
 
     public static ItemStack parseMaterialID(String str) {
@@ -124,31 +60,35 @@ public class Util {
                     if (mat != null) {
                         if (dam == 0) {
                             return new ItemStack(mat, 1);
-                        }
-                        else {
+                        } else {
                             return new ItemStack(mat, 1, dam);
                         }
                     }
                 }
-            }
-            else if (isNumeric(str)) {
+            } else if (isNumeric(str)) {
                 Material mat = Material.getMaterial(Integer.parseInt(str));
-                if (mat != null) { return new ItemStack(mat, 1); }
-            }
-            else if (str.equalsIgnoreCase("MISC")) {
+                if (mat != null) {
+                    return new ItemStack(mat, 1);
+                }
+            } else if (str.equalsIgnoreCase("MISC")) {
                 return new ItemStack(Material.AIR);
-            }
-            else {
+            } else {
                 Material mat = Material.getMaterial(str.toUpperCase());
-                if (mat != null) { return new ItemStack(mat, 1); }
+                if (mat != null) {
+                    return new ItemStack(mat, 1);
+                }
             }
         }
         return null;
     }
 
     public static boolean isNumeric(String str) {
-        if (str.equalsIgnoreCase("")) { return false; }
-        if (str.contains(",")) { return false; }
+        if (str.equalsIgnoreCase("")) {
+            return false;
+        }
+        if (str.contains(",")) {
+            return false;
+        }
         NumberFormat formatter = NumberFormat.getInstance();
         ParsePosition pos = new ParsePosition(0);
         formatter.parse(str, pos);
@@ -185,8 +125,7 @@ public class Util {
                 }
             }
             return i;
-        }
-        else {
+        } else {
             if (!AutoSort.bkError) {
                 AutoSort.bkError = true;
                 AutoSort.LOGGER.warning(plugin.getName() + ": Can't access custom inventories without BKCommonLib Loaded.");
@@ -195,6 +134,57 @@ public class Util {
             }
         }
         return null;
+    }
+
+    public boolean isValidInventoryBlock(Block block) {
+        return isValidInventoryBlock(null, block, false);
+    }
+
+    public boolean isValidInventoryBlock(Player player, Block block, Boolean isEventCheck) {
+        int blockId = block.getTypeId();
+        int blockData = block.getData();
+        if (plugin.sortBlocks.containsKey(new InventoryBlock(blockId, blockData))) {
+            return true;
+        } else if (plugin.sortBlocks.containsKey(new InventoryBlock(blockId))) {
+            return true;
+        } else {
+            if (isEventCheck) player.sendMessage(ChatColor.RED + "That's not a recognized inventory block!");
+            return false;
+        }
+    }
+
+    public boolean isValidDepositBlock(Block block) {
+        return isValidDepositBlock(null, block, false);
+    }
+
+    public boolean isValidDepositBlock(Player player, Block block, Boolean isEventCheck) {
+        int blockId = block.getTypeId();
+        int blockData = block.getData();
+        if (plugin.depositBlocks.containsKey(new InventoryBlock(blockId, blockData))) {
+            return true;
+        } else if (plugin.depositBlocks.containsKey(new InventoryBlock(blockId))) {
+            return true;
+        } else {
+            if (isEventCheck) player.sendMessage(ChatColor.RED + "That's not a recognized inventory block!");
+            return false;
+        }
+    }
+
+    public boolean isValidWithdrawBlock(Block block) {
+        return isValidWithdrawBlock(null, block, false);
+    }
+
+    public boolean isValidWithdrawBlock(Player player, Block block, Boolean isEventCheck) {
+        int blockId = block.getTypeId();
+        int blockData = block.getData();
+        if (plugin.withdrawBlocks.containsKey(new InventoryBlock(blockId, blockData))) {
+            return true;
+        } else if (plugin.withdrawBlocks.containsKey(new InventoryBlock(blockId))) {
+            return true;
+        } else {
+            if (isEventCheck) player.sendMessage(ChatColor.RED + "That's not a recognized inventory block!");
+            return false;
+        }
     }
 
     /* For Future Reference
@@ -220,20 +210,24 @@ public class Util {
     */
 
     public Block findSign(Block block) {
-        BlockFace[] surchest = { BlockFace.SELF, BlockFace.NORTH, BlockFace.EAST, BlockFace.SOUTH, BlockFace.WEST };
-        for(BlockFace face : surchest) {
+        BlockFace[] surchest = {BlockFace.SELF, BlockFace.NORTH, BlockFace.EAST, BlockFace.SOUTH, BlockFace.WEST};
+        for (BlockFace face : surchest) {
             Block sign = block.getRelative(face);
-            if (sign.getType().equals(Material.WALL_SIGN) || sign.getType().equals(Material.SIGN_POST)) { return sign; }
+            if (sign.getType().equals(Material.WALL_SIGN) || sign.getType().equals(Material.SIGN_POST)) {
+                return sign;
+            }
         }
         return null;
     }
 
     public Block doubleChest(Block block) {
         if (block.getType().equals(Material.CHEST) || block.getType().equals(Material.TRAPPED_CHEST)) {
-            BlockFace[] surchest = { BlockFace.NORTH, BlockFace.EAST, BlockFace.SOUTH, BlockFace.WEST };
-            for(BlockFace face : surchest) {
+            BlockFace[] surchest = {BlockFace.NORTH, BlockFace.EAST, BlockFace.SOUTH, BlockFace.WEST};
+            for (BlockFace face : surchest) {
                 Block otherHalf = block.getRelative(face);
-                if (otherHalf.getType().equals(block.getType())) { return otherHalf; }
+                if (otherHalf.getType().equals(block.getType())) {
+                    return otherHalf;
+                }
             }
         }
         return block;
@@ -247,13 +241,13 @@ public class Util {
         ItemStack wantedItem = settings.inventory.get(settings.currentItemIdx).item;
         Map<Integer, ItemStack> couldntFit = null;
         Inventory networkInv;
-        for(SortChest chest : settings.sortNetwork.sortChests) {
+        for (SortChest chest : settings.sortNetwork.sortChests) {
             //if (chest.signText.contains("LAVAFURNACE")) continue; // TODO Lavafurnace block
             if (!chest.block.getChunk().isLoaded())
                 chest.block.getChunk().load();
             networkInv = getInventory(chest.block);
             if (networkInv == null) return false;
-            for(int idx = 0; idx < networkInv.getSize(); idx++) {
+            for (int idx = 0; idx < networkInv.getSize(); idx++) {
                 ItemStack networkItem = networkInv.getItem(idx);
                 if (networkItem != null) {
                     if (networkItem.equals(wantedItem)) {
@@ -262,20 +256,25 @@ public class Util {
                         ItemStack stack = networkItem;
                         if (wantedAmount >= foundAmount && foundAmount != 0) { // Found amount and was less then wanted
                             couldntFit = withdrawInv.addItem(stack);
-                            if (couldntFit != null && !couldntFit.isEmpty()) { return false; }
+                            if (couldntFit != null && !couldntFit.isEmpty()) {
+                                return false;
+                            }
                             wantedAmount -= foundAmount;
                             settings.wantedAmount = wantedAmount;
                             networkInv.clear(idx);
-                        }
-                        else if (wantedAmount != 0 && wantedAmount < foundAmount) { // Found amount and was more then wanted
+                        } else if (wantedAmount != 0 && wantedAmount < foundAmount) { // Found amount and was more then wanted
                             while (wantedAmount > 0) {
                                 couldntFit = withdrawInv.addItem(stack);
-                                if (couldntFit != null && !couldntFit.isEmpty()) { return false; }
+                                if (couldntFit != null && !couldntFit.isEmpty()) {
+                                    return false;
+                                }
                                 wantedAmount -= foundAmount;
                                 settings.wantedAmount = wantedAmount;
                                 networkInv.clear(idx);
                             }
-                            if (couldntFit != null && !couldntFit.isEmpty()) { return false; }
+                            if (couldntFit != null && !couldntFit.isEmpty()) {
+                                return false;
+                            }
                             wantedAmount -= foundAmount;
                             settings.wantedAmount = wantedAmount;
                         }
@@ -292,17 +291,18 @@ public class Util {
         try {
             if (settings.block != null && !settings.block.getChunk().isLoaded())
                 settings.block.getChunk().load();
-            if (tooManyItems(player, settings)) player.sendMessage(ChatColor.GOLD + settings.netName + ChatColor.RED + " is too full to replace withdrawchest Items!");
+            if (tooManyItems(player, settings))
+                player.sendMessage(ChatColor.GOLD + settings.netName + ChatColor.RED + " is too full to replace withdrawchest Items!");
             settings.withdrawInventory.clear();
             settings.withdrawInventory.setItem(0, dummyItem);
             settings.withdrawInventory.setItem(8, dummyItem);
 
-            for(settings.currentItemIdx = settings.startItemIdx; settings.currentItemIdx < settings.inventory.size(); settings.currentItemIdx++) {
+            for (settings.currentItemIdx = settings.startItemIdx; settings.currentItemIdx < settings.inventory.size(); settings.currentItemIdx++) {
                 settings.wantedAmount = settings.inventory.get(settings.currentItemIdx).amount;
                 makeWithdraw(player, settings);
             }
             if (settings.withdrawInventory.firstEmpty() != -1 && settings.startItemIdx != 0) {
-                for(int count = 0; count < settings.startItemIdx; count++) {
+                for (int count = 0; count < settings.startItemIdx; count++) {
                     settings.currentItemIdx = count;
                     settings.wantedAmount = settings.inventory.get(count).amount;
                     makeWithdraw(player, settings);
@@ -329,7 +329,7 @@ public class Util {
         boolean tooManyItems = false;
         Inventory inv = settings.withdrawInventory;
         Location dropLoc = player.getLocation();
-        for(int i = 0; i < inv.getSize(); i++) {
+        for (int i = 0; i < inv.getSize(); i++) {
             if (inv.getItem(i) != null) {
                 if (!settings.sortNetwork.quickSortItem(inv.getItem(i))) {
                     dropLoc.getWorld().dropItem(dropLoc, inv.getItem(i));
@@ -341,17 +341,16 @@ public class Util {
     }
 
     public boolean updateInventoryList(Player player, CustomPlayer settings) {
-        for(SortChest chest : settings.sortNetwork.sortChests) {
+        for (SortChest chest : settings.sortNetwork.sortChests) {
             //if (chest.signText.contains("LAVAFURNACE")) continue; //TODO lavafurnace block
             Inventory inv = Util.getInventory(chest.block);
             if (inv == null) continue;
-            for(ItemStack item : inv) {
+            for (ItemStack item : inv) {
                 if (item != null) {
                     int index = settings.findItem(item);
                     if (index != -1) {
                         settings.inventory.get(index).amount += item.getAmount();
-                    }
-                    else {
+                    } else {
                         settings.inventory.add(new InventoryItem(item, item.getAmount()));
                     }
                 }
@@ -375,7 +374,7 @@ public class Util {
             if (plugin.asListener.chestLock.containsKey(player.getName())) {
                 plugin.asListener.chestLock.remove(player.getName());
                 Inventory inv = settings.withdrawInventory;
-                for(int i = 0; i < inv.getSize(); i++) {
+                for (int i = 0; i < inv.getSize(); i++) {
                     if (inv.getItem(i) != null) {
                         settings.sortNetwork.sortItem(inv.getItem(i));
                     }

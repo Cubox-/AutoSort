@@ -1,20 +1,13 @@
 package plugin.arcwolf.autosort.Network;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
-
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
-
 import plugin.arcwolf.autosort.AutoSort;
 import plugin.arcwolf.autosort.Util;
+
+import java.util.*;
 
 public class SortNetwork {
 
@@ -48,7 +41,6 @@ public class SortNetwork {
     public Map<Block, NetworkItem> dropSigns = new HashMap<Block, NetworkItem>();
 
     /**
-     * 
      * @param owner
      * @param netName
      * @param world
@@ -61,7 +53,7 @@ public class SortNetwork {
     }
 
     public SortChest findSortChest(Block block) {
-        for(SortChest sc : sortChests) {
+        for (SortChest sc : sortChests) {
             if (sc.block.equals(block)) return sc;
         }
         return null;
@@ -79,7 +71,7 @@ public class SortNetwork {
 
     public Inventory findItemStack(ItemStack item) {
         Inventory inv = null;
-        for(SortChest sc : sortChests) {
+        for (SortChest sc : sortChests) {
             inv = Util.getInventory(sc.block);
             if (!sc.block.getChunk().isLoaded())
                 sc.block.getChunk().load();
@@ -91,10 +83,10 @@ public class SortNetwork {
     }
 
     public boolean sortItem(ItemStack item, int minPriority) {
-        for(int priority = 1; priority <= minPriority; priority++) {
-            for(SortChest chest : sortChests) {
+        for (int priority = 1; priority <= minPriority; priority++) {
+            for (SortChest chest : sortChests) {
                 if (chest.priority == priority) {
-                    for(ItemStack mat : chest.matList) {
+                    for (ItemStack mat : chest.matList) {
                         if (mat == null) {
                             AutoSort.LOGGER.warning("----------------------------");
                             AutoSort.LOGGER.warning("The material group for chest at:");
@@ -107,7 +99,7 @@ public class SortNetwork {
                         }
                         boolean ignoreData = true;
                         if (AutoSort.customMatGroups.containsKey(chest.signText)) {
-                            for(ItemStack i : AutoSort.customMatGroups.get(chest.signText)) {
+                            for (ItemStack i : AutoSort.customMatGroups.get(chest.signText)) {
                                 if (i != null && i.getDurability() > 0) {
                                     ignoreData = false;
                                 }
@@ -117,8 +109,7 @@ public class SortNetwork {
                             if (mat.getType().equals(item.getType())) {
                                 if (moveItemToChest(item, chest)) return true;
                             }
-                        }
-                        else {
+                        } else {
                             if (mat.getType().equals(item.getType()) && mat.getData().equals(item.getData())) {
                                 if (moveItemToChest(item, chest)) return true;
                             }
@@ -126,7 +117,7 @@ public class SortNetwork {
                     }
                 }
             }
-            for(SortChest chest : sortChests) { // Sorts MISC items into MISC group. References to Material AIR are used for MISC in mat group
+            for (SortChest chest : sortChests) { // Sorts MISC items into MISC group. References to Material AIR are used for MISC in mat group
                 if (chest.priority == priority) {
                     if (chest.matList.get(0) == null) continue;
                     if (chest.matList.size() == 1 && chest.matList.get(0).getType().equals(Material.AIR)) {
@@ -146,7 +137,9 @@ public class SortNetwork {
                 try {
                     if (item != null) {
                         Map<Integer, ItemStack> couldntFit = inv.addItem(item);
-                        if (couldntFit.isEmpty()) { return true; }
+                        if (couldntFit.isEmpty()) {
+                            return true;
+                        }
                     }
                 } catch (Exception e) {
                     AutoSort.LOGGER.warning("[AutoSort] Error occured moving item to chest. " + chest.block.getLocation());
