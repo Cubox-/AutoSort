@@ -8,7 +8,7 @@ This repository has been forked from [bitbucket.com/arcwolf/autosort](https://bi
 ### Original Authors
 
  - **ArcWolf**
-   - Github: [https://github.com/arcwolf]()
+   - Github: [https://github.com/arcwolf](https://github.com/arcwolf)
    - BitBucket: [https://bitbucket.org/arcwolf/](https://bitbucket.org/arcwolf/)
  - **TheJuggernaut0**
    - _No links was found on the original repository or the clone on github._
