@@ -60,15 +60,12 @@ public class CommandHandler {
                 }
                 if ((network.owner.equals(ownerUUID) || network.members.contains(ownerUUID)) || plugin.hasPermission(player, "autosort.override")) {
                     sortPlayerInventory(9, sender, args[0], args[1], network);
-                    return;
                 } else {
                     sender.sendMessage(ChatColor.RED + "Sorry you are not a member of the " + ChatColor.YELLOW + args[1] + ChatColor.WHITE + " network.");
-                    return;
                 }
             } else {
                 sender.sendMessage(ChatColor.RED + "Incorrect command arguments");
                 sender.sendMessage("Try " + ChatColor.YELLOW + " /autosort <networkName>");
-                return;
             }
         } else if (commandName.equalsIgnoreCase("autosortall")) {
             if (!plugin.hasPermission(player, "autosort.autosort")) {
@@ -84,7 +81,6 @@ public class CommandHandler {
                     return;
                 }
                 sortPlayerInventory(0, sender, player.getName(), args[0], network);
-                return;
             } else if (args.length == 2) {
                 if (args[1].equalsIgnoreCase("$Public")) args[1] = args[1].toUpperCase();
                 UUID uuid = getPlayerUUID(args[0], sender);
@@ -96,15 +92,12 @@ public class CommandHandler {
                 }
                 if ((network.owner.equals(player.getUniqueId()) || network.members.contains(player.getUniqueId())) || plugin.hasPermission(player, "autosort.override")) {
                     sortPlayerInventory(0, sender, args[0], args[1], network);
-                    return;
                 } else {
                     sender.sendMessage(ChatColor.RED + "Sorry you are not a member of the " + ChatColor.YELLOW + args[1] + ChatColor.WHITE + " network.");
-                    return;
                 }
             } else {
                 sender.sendMessage(ChatColor.RED + "Incorrect command arguments");
                 sender.sendMessage("Try " + ChatColor.YELLOW + " /autosortall <networkName>");
-                return;
             }
         } else if (commandName.equalsIgnoreCase("asreload")) {
             if (!plugin.hasPermission(player, "autosort.reload")) {
@@ -112,7 +105,6 @@ public class CommandHandler {
                 return;
             }
             reload(sender);
-            return;
         } else if (commandName.equalsIgnoreCase("addasgroup")) {
             if (!plugin.hasPermission(player, "autosort.addasgroup")) {
                 sender.sendMessage(ChatColor.RED + "Sorry you do not have permission for " + ChatColor.YELLOW + commandName + ChatColor.RED + " command.");
@@ -136,11 +128,9 @@ public class CommandHandler {
                 plugin.saveConfig();
                 AutoSort.customMatGroups.put(groupName, matList);
                 sender.sendMessage(ChatColor.GREEN + "AutoSort group added.");
-                return;
             } else {
                 sender.sendMessage(ChatColor.RED + "Incorrect command arguments");
                 sender.sendMessage("Try " + ChatColor.YELLOW + " /addasgroup <groupName> <itemID>");
-                return;
             }
         } else if (commandName.equalsIgnoreCase("modasgroup")) {
             if (!plugin.hasPermission(player, "autosort.modasgroup")) {
@@ -186,11 +176,9 @@ public class CommandHandler {
                 } else {
                     sender.sendMessage(ChatColor.RED + "That group does not exist!");
                 }
-                return;
             } else {
                 sender.sendMessage(ChatColor.RED + "Incorrect command arguments");
                 sender.sendMessage("Try " + ChatColor.YELLOW + " /modasgroup <groupName>");
-                return;
             }
         } else if (commandName.equalsIgnoreCase("delasgroup")) {
             if (!plugin.hasPermission(player, "autosort.delasgroup")) {
@@ -208,11 +196,9 @@ public class CommandHandler {
                 } else {
                     sender.sendMessage(ChatColor.RED + "That group does not exist!");
                 }
-                return;
             } else {
                 sender.sendMessage(ChatColor.RED + "Incorrect command arguments");
                 sender.sendMessage("Try " + ChatColor.YELLOW + " /delasgroup <groupName>");
-                return;
             }
         } else if (commandName.equalsIgnoreCase("ascleanup")) {
             if (!plugin.hasPermission(player, "autosort.ascleanup")) {
@@ -225,7 +211,6 @@ public class CommandHandler {
             sender.sendMessage("Check server log for information on cleanup procedure.");
             AutoSort.LOGGER.info("AutoSort: Finished Command Cleanup Process.");
             sender.sendMessage(ChatColor.BLUE + "Done.");
-            return;
         } else if (commandName.equalsIgnoreCase("addtonet")) {
             if (!plugin.hasPermission(player, "autosort.addtonet")) {
                 sender.sendMessage(ChatColor.RED + "Sorry you do not have permission for " + ChatColor.YELLOW + commandName + ChatColor.RED + " command.");
@@ -251,7 +236,6 @@ public class CommandHandler {
                         }
                     }
                     sender.sendMessage(count + " " + ChatColor.BLUE + "Player(s) successfully added to the network.");
-                    return;
                 } else if (net == null && plugin.hasPermission(player, "autosort.override")) {
                     if (args.length > 2) {
                         netName = args[1];
@@ -271,7 +255,6 @@ public class CommandHandler {
                                 }
                             }
                             sender.sendMessage(count + " " + ChatColor.BLUE + "Player(s) successfully added to the network.");
-                            return;
                         } else {
                             sender.sendMessage(ChatColor.RED + "The network '" + netName + "' could not be found.");
                         }
@@ -307,7 +290,6 @@ public class CommandHandler {
                         }
                     }
                     sender.sendMessage(count + " " + ChatColor.BLUE + "Player(s) successfully removed from the network.");
-                    return;
                 } else if (net == null && plugin.hasPermission(player, "autosort.override")) {
                     if (args.length > 2) {
                         netName = args[1];
@@ -327,7 +309,6 @@ public class CommandHandler {
                                 }
                             }
                             sender.sendMessage(count + " " + ChatColor.BLUE + "Player(s) successfully removed from the network.");
-                            return;
                         } else {
                             sender.sendMessage(ChatColor.RED + "The network '" + netName + "' could not be found.");
                         }
@@ -367,7 +348,6 @@ public class CommandHandler {
                 String msg = list.substring(0, list.length() - 2);
                 sender.sendMessage(msg);
             }
-            return;
         } else if (commandName.equalsIgnoreCase("listasmembers")) {
             if (!plugin.hasPermission(player, "autosort.listasmembers")) {
                 sender.sendMessage(ChatColor.RED + "Sorry you do not have permission for " + ChatColor.YELLOW + commandName + ChatColor.RED + " command.");
@@ -406,7 +386,6 @@ public class CommandHandler {
             }
             if (doList) {
                 listMembers(sender, network);
-                return;
             }
         } else if (commandName.equalsIgnoreCase("asremnet")) {
             if (!plugin.hasPermission(player, "autosort.remnet")) {
@@ -426,7 +405,6 @@ public class CommandHandler {
             if (!deleteNetwork(sender, ownerId, ownerName, netName, sender.getName())) return;
             sender.sendMessage(ChatColor.YELLOW + "The network ( " + ChatColor.WHITE + netName + ChatColor.YELLOW + " ) owned by ( " + ChatColor.WHITE + ownerName + ChatColor.YELLOW + " ) is deleted.");
             plugin.saveVersion6Network();
-            return;
         } else if (commandName.equals("aswithdraw")) {
             if (!plugin.hasPermission(player, "autosort.use.withdrawcommand")) {
                 sender.sendMessage(ChatColor.RED + "Sorry you do not have permission for " + ChatColor.YELLOW + commandName + ChatColor.RED + " command.");
@@ -444,7 +422,6 @@ public class CommandHandler {
                     return;
                 }
                 doCommandWithdraw(player, network, ownerId, netName);
-                return;
             } else if (args.length == 2) { // /aswithdraw <ownerName> <netName>
                 UUID ownerId = getPlayerUUID(args[0], sender);
                 if (ownerId == null) return;
@@ -456,10 +433,8 @@ public class CommandHandler {
                 }
                 if ((network.owner.equals(player.getUniqueId()) || network.members.contains(player.getUniqueId()) || network.netName.equalsIgnoreCase("$Public")) || plugin.hasPermission(player, "autosort.override")) {
                     doCommandWithdraw(player, network, ownerId, netName);
-                    return;
                 } else {
                     sender.sendMessage(ChatColor.RED + "Sorry you are not a member of the " + ChatColor.YELLOW + args[1] + ChatColor.WHITE + " network.");
-                    return;
                 }
             }
         } else {
@@ -518,7 +493,6 @@ public class CommandHandler {
         if (commandName.equalsIgnoreCase("asreload")) {
             if (args.length == 0) {
                 reload(sender);
-                return;
             }
         } else if (commandName.equalsIgnoreCase("addtonet")) {
             if (args.length > 2) {
@@ -544,7 +518,6 @@ public class CommandHandler {
                         }
                     }
                     sender.sendMessage(count + " " + ChatColor.BLUE + "Player(s) successfully added to the network.");
-                    return;
                 } else {
                     sender.sendMessage(ChatColor.RED + "The network '" + netName + "' could not be found.");
                 }
@@ -575,7 +548,6 @@ public class CommandHandler {
                         }
                     }
                     sender.sendMessage(count + " " + ChatColor.BLUE + "Player(s) successfully removed from the network.");
-                    return;
                 } else {
                     sender.sendMessage(ChatColor.RED + "The network '" + netName + "' could not be found.");
                 }
@@ -601,7 +573,6 @@ public class CommandHandler {
                 plugin.saveConfig();
                 AutoSort.customMatGroups.put(groupName, matList);
                 sender.sendMessage(ChatColor.GREEN + "AutoSort group added.");
-                return;
             }
         } else if (commandName.equalsIgnoreCase("modasgroup")) {
             if (args.length > 1) {
@@ -631,7 +602,6 @@ public class CommandHandler {
                 } else {
                     sender.sendMessage(ChatColor.RED + "That group does not exist!");
                 }
-                return;
             }
         } else if (commandName.equalsIgnoreCase("delasgroup")) {
             if (args.length == 1) {
@@ -645,13 +615,11 @@ public class CommandHandler {
                 } else {
                     sender.sendMessage(ChatColor.RED + "That group does not exist!");
                 }
-                return;
             }
         } else if (commandName.equalsIgnoreCase("ascleanup")) {
             sender.sendMessage(ChatColor.BLUE + "Cleaning up all AutoSort networks...");
             if (!plugin.cleanupNetwork()) AutoSort.LOGGER.info("AutoSort: All networks are clean.");
             sender.sendMessage(ChatColor.BLUE + "Done.");
-            return;
         } else if (commandName.equalsIgnoreCase("listasgroups")) {
             sender.sendMessage(ChatColor.GOLD + "Custom AutoSort material groups:");
             List<ItemStack> items;
@@ -675,7 +643,6 @@ public class CommandHandler {
                 String msg = list.substring(0, list.length() - 2);
                 sender.sendMessage(msg);
             }
-            return;
         } else if (commandName.equalsIgnoreCase("listasmembers")) {
             boolean doList = false;
             SortNetwork network = null;
@@ -696,7 +663,6 @@ public class CommandHandler {
             }
             if (doList) {
                 listMembers(sender, network);
-                return;
             }
         } else if (commandName.equalsIgnoreCase("asremnet")) {
             // /asremnet <OwnerName> <networkName>

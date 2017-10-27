@@ -937,24 +937,4 @@ public class AutoSort extends JavaPlugin {
         }
         return net;
     }
-
-    public NetworkItem findNetworkItemBySign(Block signBlock) {
-        if (signBlock.getType().equals(Material.WALL_SIGN) || signBlock.getType().equals(Material.SIGN_POST)) {
-            SortNetwork network = allNetworkBlocks.get(signBlock);
-            Sign sign = (Sign) signBlock.getState();
-            if (sign.getLine(0).startsWith("*")) {
-                for (NetworkItem ni : network.dropSigns.values()) {
-                    if (ni.sign.equals(signBlock)) return ni;
-                }
-                for (NetworkItem ni : network.depositChests.values()) {
-                    if (ni.sign.equals(signBlock)) return ni;
-                }
-            } else if (sign.getLine(0).startsWith("#")) {
-                for (NetworkItem ni : network.withdrawChests.values()) {
-                    if (ni.sign.equals(signBlock)) return ni;
-                }
-            }
-        }
-        return null;
-    }
 }

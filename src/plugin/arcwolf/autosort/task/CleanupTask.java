@@ -1,4 +1,4 @@
-package plugin.arcwolf.autosort.Task;
+package plugin.arcwolf.autosort.task;
 
 import org.bukkit.Server;
 import plugin.arcwolf.autosort.AutoSort;

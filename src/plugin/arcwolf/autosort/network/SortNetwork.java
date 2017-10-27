@@ -1,4 +1,4 @@
-package plugin.arcwolf.autosort.Network;
+package plugin.arcwolf.autosort.network;
 
 import org.bukkit.Material;
 import org.bukkit.block.Block;
@@ -66,19 +66,6 @@ public class SortNetwork {
 
     public boolean quickSortItem(ItemStack item) { // Sort Chests without empties first sort
         return sortItem(item, 4);
-    }
-
-    public Inventory findItemStack(ItemStack item) {
-        Inventory inv = null;
-        for (SortChest sc : sortChests) {
-            inv = Util.getInventory(sc.block);
-            if (!sc.block.getChunk().isLoaded())
-                sc.block.getChunk().load();
-            if (inv != null) {
-                if (inv.first(item.getType()) != -1) return inv;
-            }
-        }
-        return null;
     }
 
     public boolean sortItem(ItemStack item, int minPriority) {

@@ -17,38 +17,6 @@ public class InventoryBlock {
         setUsedataValue(true);
     }
 
-    /**
-     * @return the itemId
-     */
-    public int getItemId() {
-        return itemId;
-    }
-
-    /**
-     * @param itemId the itemId to set
-     */
-    public void setItemId(int itemId) {
-        this.itemId = itemId;
-    }
-
-    /**
-     * @return the dataValue
-     */
-    public int getDataValue() {
-        return dataValue;
-    }
-
-    /**
-     * @param dataValue the dataValue to set
-     */
-    public void setDataValue(int dataValue) {
-        this.dataValue = dataValue;
-    }
-
-    public boolean isUsedataValue() {
-        return usedataValue;
-    }
-
     public void setUsedataValue(boolean usedataValue) {
         this.usedataValue = usedataValue;
     }

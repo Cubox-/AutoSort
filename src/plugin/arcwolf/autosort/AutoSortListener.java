@@ -33,8 +33,6 @@ import java.util.List;
 import java.util.Map.Entry;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
-//import plugin.arcwolf.lavafurnace.FurnaceObject;
-//import plugin.arcwolf.lavafurnace.LavaFurnace;
 
 public class AutoSortListener implements Listener {
 
@@ -392,16 +390,13 @@ public class AutoSortListener implements Listener {
                                 } else {
                                     player.sendMessage(ChatColor.RED + "You can only place chests within " + prox + " blocks of the original chest!");
                                     event.setCancelled(true);
-                                    return;
                                 }
                             } else {
                                 player.sendMessage(ChatColor.RED + "You can't add to a network unless you are in the same world as it!");
                                 event.setCancelled(true);
-                                return;
                             }
                         } else {
                             event.setCancelled(true);
-                            return;
                         }
                     } else { //TODO Sort Chest
                         String[] matParts = mat.split(",");
@@ -411,12 +406,6 @@ public class AutoSortListener implements Listener {
                                 event.setCancelled(true);
                                 return;
                             }
-                            /*TODO Lavafurnace Disabled UUID checks
-                            if (!lavaFurnaceCheck(player, sortNetwork, storageBlock, part)) {
-                                event.getPlayer().sendMessage(ChatColor.RED + "You are not the owner of this LavaFurnace.");
-                                event.setCancelled(true);
-                                return;
-                            }*/
                         }
                         if (plugin.util.isValidInventoryBlock(player, storageBlock, true) && plugin.canAccessProtection(player, storageBlock) && !isInNetwork(player, storageBlock)) {
                             boolean dd = !mat.contains(":");
@@ -436,27 +425,22 @@ public class AutoSortListener implements Listener {
                                     } else {
                                         player.sendMessage(ChatColor.RED + "You can only place chests within " + prox + " blocks of the original chest!");
                                         event.setCancelled(true);
-                                        return;
                                     }
                                 } else {
                                     player.sendMessage(ChatColor.RED + "You can't add to a network unless you are in the same world as it!");
                                     event.setCancelled(true);
-                                    return;
                                 }
                             } else {
                                 player.sendMessage(ChatColor.RED + "You don't have permission to use that network!");
                                 event.setCancelled(true);
-                                return;
                             }
                         } else {
                             event.setCancelled(true);
-                            return;
                         }
                     }
                 } else {
                     event.setCancelled(true);
                     event.getPlayer().sendMessage(ChatColor.RED + "You do not have permission to create AutoSort chests.");
-                    return;
                 }
             }
         } else if (event.getBlock().getType().equals(Material.SIGN_POST)) { // TODO Drop Sign
@@ -477,12 +461,10 @@ public class AutoSortListener implements Listener {
                         } else {
                             player.sendMessage(ChatColor.RED + "You can only place drop signs within " + prox + " blocks of the original chest!");
                             event.setCancelled(true);
-                            return;
                         }
                     } else {
                         player.sendMessage(ChatColor.RED + "You can't add to a network unless you are in the same world as it!");
                         event.setCancelled(true);
-                        return;
                     }
                 }
             }
@@ -521,7 +503,6 @@ public class AutoSortListener implements Listener {
             if (lines[0].startsWith("*") || lines[0].startsWith("#")) {
                 if (plugin.allNetworkBlocks.containsKey(block)) {
                     event.setCancelled(true);
-                    return;
                 }
             }
         }
@@ -544,13 +525,10 @@ public class AutoSortListener implements Listener {
                 plugin.allNetworkBlocks.remove(block);
                 network.dropSigns.remove(block);
                 event.getPlayer().sendMessage(ChatColor.BLUE + "Drop sign removed.");
-                return;
             } else {
-
                 event.getPlayer().sendMessage("This network is owned by " + Util.getName(pId) + ChatColor.YELLOW + "(" + network.owner + ")");
                 event.getPlayer().sendMessage(ChatColor.RED + "You can't modify this network.");
                 event.setCancelled(true);
-                return;
             }
         } else if (block.getType().equals(Material.WALL_SIGN)) {
             network = plugin.allNetworkBlocks.get(block);
@@ -578,7 +556,6 @@ public class AutoSortListener implements Listener {
                         network.depositChests.remove(storageBlock);
                         network.depositChests.remove(plugin.util.doubleChest(storageBlock));
                         event.getPlayer().sendMessage(ChatColor.BLUE + "Deposit chest removed.");
-                        return;
                     } else {
                         // Sort Chest
                         SortChest sc = network.findSortChest(storageBlock);
@@ -588,7 +565,6 @@ public class AutoSortListener implements Listener {
                         plugin.allNetworkBlocks.remove(sc.sign);
                         network.sortChests.remove(sc);
                         event.getPlayer().sendMessage(ChatColor.BLUE + "Sort chest removed.");
-                        return;
                     }
                 } else if (lines[0].startsWith("#")) {
                     // Withdraw Chest
@@ -604,7 +580,6 @@ public class AutoSortListener implements Listener {
                         player.sendMessage("This network is being withdrawn from by " + ChatColor.YELLOW + user);
                         player.sendMessage(ChatColor.GOLD + "Please wait...");
                         event.setCancelled(true);
-                        return;
                     } else {
                         plugin.allNetworkBlocks.remove(block);
                         plugin.allNetworkBlocks.remove(storageBlock);
@@ -612,14 +587,12 @@ public class AutoSortListener implements Listener {
                         network.withdrawChests.remove(storageBlock);
                         network.withdrawChests.remove(plugin.util.doubleChest(storageBlock));
                         event.getPlayer().sendMessage(ChatColor.BLUE + "Withdraw chest removed.");
-                        return;
                     }
                 }
             } else {
                 event.getPlayer().sendMessage("This network is owned by " + Util.getName(pId) + ChatColor.YELLOW + "(" + network.owner + ")");
                 event.getPlayer().sendMessage(ChatColor.RED + "You can't modify this network.");
                 event.setCancelled(true);
-                return;
             }
         } else if (plugin.util.isValidInventoryBlock(player, block, false)) {
             network = plugin.allNetworkBlocks.get(block);
@@ -657,7 +630,6 @@ public class AutoSortListener implements Listener {
                         player.sendMessage("This network is being withdrawn from by " + ChatColor.YELLOW + user);
                         player.sendMessage(ChatColor.GOLD + "Please wait...");
                         event.setCancelled(true);
-                        return;
                     } else {
                         CustomPlayer settings = CustomPlayer.getSettings(event.getPlayer());
                         settings.clearPlayer();
@@ -676,7 +648,6 @@ public class AutoSortListener implements Listener {
                         plugin.allNetworkBlocks.remove(signBlock);
                         network.withdrawChests.remove(block);
                         event.getPlayer().sendMessage(ChatColor.BLUE + "Withdraw chest removed.");
-                        return;
                     }
                 } else {
                     SortChest sortChest = network.findSortChest(block);
@@ -693,31 +664,14 @@ public class AutoSortListener implements Listener {
                     plugin.allNetworkBlocks.remove(sortChest.sign);
                     network.sortChests.remove(sortChest);
                     event.getPlayer().sendMessage(ChatColor.BLUE + "Sort chest removed.");
-                    return;
                 }
             } else {
                 event.getPlayer().sendMessage("This network is owned by " + Util.getName(pId) + ChatColor.YELLOW + "(" + network.owner + ")");
                 event.getPlayer().sendMessage(ChatColor.RED + "You can't modify this network.");
                 event.setCancelled(true);
-                return;
             }
         }
     }
-
-    //TODO Helper Methods / Classes
-
-    /* LavaFurnace Disabled because of UUID
-    private boolean lavaFurnaceCheck(Player player, SortNetwork sortNetwork, Block storageBlock, String part) {
-        if (!part.toLowerCase().contains("lavafurnace")) return true;
-        LavaFurnace lfp = (LavaFurnace) LavaFurnace.plugin;
-        FurnaceObject fo = lfp.furnaceHelper.findFurnaceFromProductionChest(sortNetwork.owner, storageBlock);
-        if (fo == null) {
-            fo = lfp.furnaceHelper.findFurnaceFromProductionChest(sortNetwork.owner, plugin.util.doubleChest(storageBlock));
-        }
-        if (fo == null) { return true; }
-        if (fo.creator.equals(player.getName()) || plugin.hasPermission(player, "autosort.override")) return true;
-        return false;
-    }*/
 
     private boolean hopperDropperStopper(List<Block> blocksToTest, Player player) {
         UUID owner = player.getUniqueId();

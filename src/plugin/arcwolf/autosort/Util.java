@@ -187,28 +187,6 @@ public class Util {
         }
     }
 
-    /* For Future Reference
-    public static Inventory tryNMSInventory(Block block) {
-        Inventory i = null;
-        try {
-            if (block == null) return null;
-            CraftWorld world = (CraftWorld) block.getWorld();
-            World mWorld = world.getHandle();
-            TileEntity te = mWorld.getTileEntity(block.getX(), block.getY(), block.getZ());
-            IInventory ii = (IInventory) te;
-            CraftInventory ci = new CraftInventory(ii);
-            i = ci;
-        } catch (Exception e) {
-            if (AutoSort.getDebug() == 1) {
-                System.out.println("unknown inventory type");
-                e.printStackTrace();
-                System.out.println("----------------------------");
-            }
-        }
-        return i;
-    }
-    */
-
     public Block findSign(Block block) {
         BlockFace[] surchest = {BlockFace.SELF, BlockFace.NORTH, BlockFace.EAST, BlockFace.SOUTH, BlockFace.WEST};
         for (BlockFace face : surchest) {

@@ -1,4 +1,4 @@
-package plugin.arcwolf.autosort.Task;
+package plugin.arcwolf.autosort.task;
 
 import org.bukkit.Material;
 import org.bukkit.World;
@@ -10,10 +10,10 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.Vector;
 import plugin.arcwolf.autosort.AutoSort;
-import plugin.arcwolf.autosort.Network.NetworkItem;
-import plugin.arcwolf.autosort.Network.SortChest;
-import plugin.arcwolf.autosort.Network.SortNetwork;
 import plugin.arcwolf.autosort.Util;
+import plugin.arcwolf.autosort.network.NetworkItem;
+import plugin.arcwolf.autosort.network.SortChest;
+import plugin.arcwolf.autosort.network.SortNetwork;
 
 import java.util.List;
 import java.util.Map.Entry;
@@ -106,7 +106,7 @@ public class SortTask implements Runnable {
                             for (SortChest chest : net.sortChests) {
                                 if (chest.block.getChunk().isLoaded()) {
                                     if (chest.priority == i && plugin.util.isValidInventoryBlock(chest.block)) {
-                                        if (chest.signText.contains("LAVAFURNACE")) continue; //TODO lavafurnace block
+                                        if (chest.signText.contains("LAVAFURNACE")) continue;
                                         Inventory inv = Util.getInventory(chest.block);
                                         if (inv != null) {
                                             ItemStack[] items = inv.getContents();
@@ -128,30 +128,11 @@ public class SortTask implements Runnable {
                     }
                 }
             }
+        } catch (Exception e) {
+            AutoSort.LOGGER.warning("[AutoSort] Error in Sort Chests Sort Thread");
+            e.printStackTrace();
+        }
 
-        } catch (Exception e) {
-            AutoSort.LOGGER.warning("[AutoSort] Error in Sort Chests Sort Thread");
-            e.printStackTrace();
-        }
-        /* LavaFurnace is not 1.8 compat. Code disabled.
-        try {
-            if (plugin.getServer().getPluginManager().getPlugin("LavaFurnace") == null) return;
-            for(List<SortNetwork> networks : plugin.networks.values()) {
-                for(SortNetwork net : networks) {
-                    for(SortChest chest : net.sortChests) {
-                        if (chest.block.getChunk().isLoaded()) {
-                            if (plugin.util.isValidInventoryBlock(chest.block)) {
-                                maintainLavaFurnace(net, chest, chest.block);
-                            }
-                        }
-                    }
-                }
-            }
-        } catch (Exception e) {
-            AutoSort.LOGGER.warning("[AutoSort] Error in Sort Chests Sort Thread");
-            e.printStackTrace();
-        }
-        */
         if (AutoSort.getDebug() == 10) {
             if (tick != (System.currentTimeMillis() - timer)) {
                 tick = (System.currentTimeMillis() - timer);
@@ -159,44 +140,6 @@ public class SortTask implements Runnable {
             }
         }
     }
-
-    // TODO Lavafurnace integration
-    /*
-    private void maintainLavaFurnace(SortNetwork net, SortChest sortChest, Block cblock) {
-        try {
-            if (!sortChest.block.getChunk().isLoaded())
-                sortChest.block.getChunk().load();
-            if (!(sortChest.sign.getType().equals(Material.WALL_SIGN))) return;
-            if (!sortChest.signText.toLowerCase().contains("lavafurnace") && !sortChest.signText.toLowerCase().contains("lavafurnace")) return;
-            LavaFurnace lfp = (LavaFurnace) LavaFurnace.plugin;
-            FurnaceHelper fh = lfp.furnaceHelper;
-            FurnaceObject fo = lfp.furnaceHelper.findFurnaceFromProductionChest(net.owner, cblock);
-            if (fo == null) return;
-            ChestHelper ch = new ChestHelper(lfp, fo);
-            Inventory furnaceInv = ch.getFurnaceInventory();
-            Furnace f = fh.getFurnace(fo);
-            int fSA = fh.getAmount(furnaceInv.getItem(0));
-            int fFA = fh.getAmount(furnaceInv.getItem(1));
-            int fPA = fh.getAmount(furnaceInv.getItem(2));
-            int burnTime = f.getBurnTime();
-            if (lfp.datawriter.isSourceChestFuel() && fo.power < 1 && fSA > 0 && fFA == 0 && burnTime <= 0 && fPA == 0 && !waitTime) { // Keep Furnaces Fueled
-                waitTime = true;
-                previousTime = timer;
-                Inventory chest = net.findItemStack(new ItemStack(Material.LAVA_BUCKET));
-                if (chest != null) {
-                    new ChestProcessing((LavaFurnace) LavaFurnace.plugin).fuelFurnaceWithLava(fo, f);
-
-                    int index = chest.first(Material.LAVA_BUCKET);
-
-                    chest.setItem(index, new ItemStack(Material.BUCKET));
-                }
-            }
-        } catch (Exception e) {
-            AutoSort.LOGGER.warning("[AutoSort] Error in LavaFurnace Thread");
-            e.printStackTrace();
-        }
-    }
-    */
 
     private void sortDropSign(Item item, Sign sign) {
         if (sign.getLine(0).startsWith("*")) {

@@ -1,4 +1,4 @@
-package plugin.arcwolf.autosort.Network;
+package plugin.arcwolf.autosort.network;
 
 import org.bukkit.block.Block;
 import org.bukkit.inventory.Inventory;
