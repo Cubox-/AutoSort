@@ -45,7 +45,6 @@ public class SortNetwork {
      * @param netName
      * @param world
      */
-
     public SortNetwork(UUID owner, String netName, String world) {
         this.owner = owner;
         this.netName = netName;

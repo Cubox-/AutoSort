@@ -25,6 +25,13 @@ public class InventoryBlock {
     }
 
     /**
+     * @param itemId the itemId to set
+     */
+    public void setItemId(int itemId) {
+        this.itemId = itemId;
+    }
+
+    /**
      * @return the dataValue
      */
     public int getDataValue() {
@@ -32,27 +39,18 @@ public class InventoryBlock {
     }
 
     /**
-     * @param itemId
-     *            the itemId to set
-     */
-    public void setItemId(int itemId) {
-        this.itemId = itemId;
-    }
-
-    /**
-     * @param dataValue
-     *            the dataValue to set
+     * @param dataValue the dataValue to set
      */
     public void setDataValue(int dataValue) {
         this.dataValue = dataValue;
     }
 
-    public void setUsedataValue(boolean usedataValue) {
-        this.usedataValue = usedataValue;
-    }
-
     public boolean isUsedataValue() {
         return usedataValue;
+    }
+
+    public void setUsedataValue(boolean usedataValue) {
+        this.usedataValue = usedataValue;
     }
 
     @Override

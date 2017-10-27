@@ -1,36 +1,29 @@
 package plugin.arcwolf.autosort.Task;
 
-import java.util.List;
-import java.util.Map.Entry;
-
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
-//import org.bukkit.block.Furnace;
 import org.bukkit.block.Sign;
 import org.bukkit.entity.Item;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.Vector;
-
 import plugin.arcwolf.autosort.AutoSort;
-import plugin.arcwolf.autosort.Util;
 import plugin.arcwolf.autosort.Network.NetworkItem;
 import plugin.arcwolf.autosort.Network.SortChest;
 import plugin.arcwolf.autosort.Network.SortNetwork;
-//import plugin.arcwolf.lavafurnace.ChestHelper;
-//import plugin.arcwolf.lavafurnace.ChestProcessing;
-//import plugin.arcwolf.lavafurnace.FurnaceHelper;
-//import plugin.arcwolf.lavafurnace.FurnaceObject;
-//import plugin.arcwolf.lavafurnace.LavaFurnace;
+import plugin.arcwolf.autosort.Util;
+
+import java.util.List;
+import java.util.Map.Entry;
 
 public class SortTask implements Runnable {
 
+    boolean waitTime = false;
     private AutoSort plugin;
     private long timer = 0;
     private long previousTime = 0;
-    boolean waitTime = false;
     private long tick = 0;
 
     public SortTask(AutoSort autoSort) {
@@ -44,19 +37,18 @@ public class SortTask implements Runnable {
             waitTime = false;
         }
         try {
-            for(Item item : plugin.items) { // Deposit Signs Sort
+            for (Item item : plugin.items) { // Deposit Signs Sort
                 if (item.getVelocity().equals(new Vector(0, 0, 0))) {
                     plugin.stillItems.add(item);
                     World world = item.getWorld();
                     Block dropSpot = world.getBlockAt(item.getLocation());
-                    BlockFace[] surrounding = { BlockFace.SELF, BlockFace.NORTH, BlockFace.NORTH_EAST, BlockFace.EAST, BlockFace.SOUTH_EAST, BlockFace.SOUTH, BlockFace.SOUTH_WEST, BlockFace.WEST, BlockFace.NORTH_WEST };
+                    BlockFace[] surrounding = {BlockFace.SELF, BlockFace.NORTH, BlockFace.NORTH_EAST, BlockFace.EAST, BlockFace.SOUTH_EAST, BlockFace.SOUTH, BlockFace.SOUTH_WEST, BlockFace.WEST, BlockFace.NORTH_WEST};
                     Block hopper;
-                    for(BlockFace face : surrounding) {
+                    for (BlockFace face : surrounding) {
                         hopper = dropSpot.getRelative(BlockFace.DOWN);
                         if (hopper.getType().equals(Material.HOPPER)) {
                             break;
-                        }
-                        else if (hopper.getRelative(face).getType().equals(Material.HOPPER)) {
+                        } else if (hopper.getRelative(face).getType().equals(Material.HOPPER)) {
                             break;
                         }
                         if (dropSpot.getRelative(face).getType().equals(Material.SIGN_POST)) {
@@ -67,7 +59,7 @@ public class SortTask implements Runnable {
                     }
                 }
             }
-            for(Item item : plugin.stillItems) {
+            for (Item item : plugin.stillItems) {
                 plugin.items.remove(item);
             }
             plugin.stillItems.clear();
@@ -77,10 +69,10 @@ public class SortTask implements Runnable {
             e.printStackTrace();
         }
         try {
-            for(List<SortNetwork> networks : plugin.networks.values())
+            for (List<SortNetwork> networks : plugin.networks.values())
                 // Deposit Chest Sort
-                for(SortNetwork net : networks)
-                    for(Entry<Block, NetworkItem> depChest : net.depositChests.entrySet()) {
+                for (SortNetwork net : networks)
+                    for (Entry<Block, NetworkItem> depChest : net.depositChests.entrySet()) {
                         if (depChest.getKey().getChunk().isLoaded()) {
                             if (net != null && plugin.util.isValidDepositBlock(depChest.getKey())) {
                                 Inventory chest = Util.getInventory(depChest.getKey());
@@ -89,7 +81,7 @@ public class SortTask implements Runnable {
                                 ItemStack[] contents = inv.getContents();
                                 int i;
                                 ItemStack is;
-                                for(i = 0; i < contents.length; i++) {
+                                for (i = 0; i < contents.length; i++) {
                                     is = contents[i];
                                     if (is != null) {
                                         if (net.sortItem(is)) {
@@ -108,10 +100,10 @@ public class SortTask implements Runnable {
 
         try {
             if (AutoSort.keepPriority) { // Priority Resort
-                for(int i = 4; i > 1; i--) {
-                    for(List<SortNetwork> networks : plugin.networks.values()) {
-                        for(SortNetwork net : networks) {
-                            for(SortChest chest : net.sortChests) {
+                for (int i = 4; i > 1; i--) {
+                    for (List<SortNetwork> networks : plugin.networks.values()) {
+                        for (SortNetwork net : networks) {
+                            for (SortChest chest : net.sortChests) {
                                 if (chest.block.getChunk().isLoaded()) {
                                     if (chest.priority == i && plugin.util.isValidInventoryBlock(chest.block)) {
                                         if (chest.signText.contains("LAVAFURNACE")) continue; //TODO lavafurnace block
@@ -119,7 +111,7 @@ public class SortTask implements Runnable {
                                         if (inv != null) {
                                             ItemStack[] items = inv.getContents();
                                             ItemStack is;
-                                            for(int j = 0; j < items.length; j++) {
+                                            for (int j = 0; j < items.length; j++) {
                                                 is = items[j];
                                                 if (is != null) {
                                                     if (net.sortItem(is, i - 1)) {

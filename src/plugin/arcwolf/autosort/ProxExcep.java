@@ -4,12 +4,11 @@ import java.util.UUID;
 
 public class ProxExcep {
 
-    private UUID owner;
     String network;
+    private UUID owner;
     private int distance;
 
     /**
-     * 
      * @param owner
      * @param network
      * @param distance

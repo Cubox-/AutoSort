@@ -1,16 +1,15 @@
 package plugin.arcwolf.autosort;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
-import java.util.concurrent.ConcurrentHashMap;
-
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
-
 import plugin.arcwolf.autosort.Network.SortNetwork;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class CustomPlayer {
 
@@ -45,7 +44,7 @@ public class CustomPlayer {
     }
 
     public int findItem(ItemStack item) {
-        for(int i = 0; i < inventory.size(); i++) {
+        for (int i = 0; i < inventory.size(); i++) {
             if (inventory.get(i).item.equals(item)) return i;
         }
         return -1;

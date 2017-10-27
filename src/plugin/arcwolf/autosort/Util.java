@@ -1,7 +1,7 @@
 package plugin.arcwolf.autosort;
 
 import com.bergerkiller.bukkit.common.conversion.Conversion;
-import com.bergerkiller.bukkit.common.reflection.classes.TileEntityRef;
+import com.bergerkiller.reflection.net.minecraft.server.NMSTileEntity;
 import org.bukkit.*;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
@@ -115,7 +115,7 @@ public class Util {
             Inventory i = null;
             try {
                 if (block == null) return null;
-                Object tileEntity = TileEntityRef.getFromWorld(block);
+                Object tileEntity = NMSTileEntity.getFromWorld(block);
                 i = Conversion.toInventory.convert(tileEntity);
             } catch (Exception e) {
                 if (AutoSort.getDebug() == 2) {

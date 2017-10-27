@@ -1,7 +1,6 @@
 package plugin.arcwolf.autosort.Task;
 
 import org.bukkit.Server;
-
 import plugin.arcwolf.autosort.AutoSort;
 
 public class CleanupTask implements Runnable {
