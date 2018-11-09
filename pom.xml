@@ -35,9 +35,9 @@
         <dependency>
             <groupId>com.bergerkiller.bukkit.common.internal.CommonPlugin</groupId>
             <artifactId>bkcommonlib</artifactId>
-            <version>1.12.2-v4-SNAPSHOT</version>
+            <version>1.13.1-v4</version>
             <scope>system</scope>
-            <systemPath>${project.basedir}/lib/BKCommonLib-1.12.2-v4-SNAPSHOT.jar</systemPath>
+            <systemPath>${project.basedir}/lib/BKCommonLib-1.13.1-v4.jar</systemPath>
         </dependency>
         <dependency>
             <groupId>net.milkbowl.vault</groupId>
