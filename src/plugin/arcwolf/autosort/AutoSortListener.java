@@ -310,8 +310,8 @@ public class AutoSortListener implements Listener {
                                 plugin.allNetworkBlocks.put(signBlock, sortNetwork);
                                 plugin.allNetworkBlocks.put(storageBlock, sortNetwork);
                                 plugin.allNetworkBlocks.put(plugin.util.doubleChest(storageBlock), sortNetwork);
-                                event.setLine(1, "�fOpen Chest");
-                                event.setLine(2, "�fTo Withdraw");
+                                event.setLine(1, "Open Chest");
+                                event.setLine(2, "To Withdraw");
                                 player.sendMessage(ChatColor.AQUA + "Withdraw chest added to network " + netName + ".");
                             } else {
                                 player.sendMessage(ChatColor.RED + "You can only place chests within " + prox + " blocks of the original chest!");
@@ -379,8 +379,8 @@ public class AutoSortListener implements Listener {
                                 Location origin = getOrigin(sortNetwork.sortChests);
                                 Location here = storageBlock.getLocation();
                                 if (prox == 0 || (origin != null && origin.distance(here) <= prox) || plugin.hasPermission(player, "autosort.ignoreproximity")) {
-                                    event.setLine(1, "�fOpen Chest");
-                                    event.setLine(2, "�fTo Deposit");
+                                    event.setLine(1, "Open chest");
+                                    event.setLine(2, "To Deposit");
                                     player.sendMessage(ChatColor.AQUA + "Deposit chest added to " + sortNetwork.netName + ".");
                                     NetworkItem netItem = new NetworkItem(sortNetwork, storageBlock, signBlock);
                                     sortNetwork.depositChests.put(storageBlock, netItem);
@@ -456,8 +456,8 @@ public class AutoSortListener implements Listener {
                             sortNetwork.dropSigns.put(sign, netItem);
                             plugin.allNetworkBlocks.put(sign, sortNetwork);
                             player.sendMessage(ChatColor.BLUE + "Drop Sign added to network " + netName + ".");
-                            event.setLine(1, "�fDrop Items");
-                            event.setLine(2, "�fOn Sign");
+                            event.setLine(1, "Drop Items");
+                            event.setLine(2, "On Sign");
                         } else {
                             player.sendMessage(ChatColor.RED + "You can only place drop signs within " + prox + " blocks of the original chest!");
                             event.setCancelled(true);
@@ -548,7 +548,7 @@ public class AutoSortListener implements Listener {
                 }
                 if (lines[0].startsWith("*")) {
                     // Deposit or Sort Chest
-                    if (lines[1].equals("�fOpen Chest")) {
+                    if (lines[1].equals("Open Chest")) {
                         // Deposit Chest
                         plugin.allNetworkBlocks.remove(block);
                         plugin.allNetworkBlocks.remove(storageBlock);
