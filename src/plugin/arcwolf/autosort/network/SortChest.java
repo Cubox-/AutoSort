@@ -31,7 +31,7 @@ public class SortChest {
 
     private List<ItemStack> parseMaterialIDList(String str) {
         String[] parts = str.split(",");
-        List<ItemStack> result = new ArrayList<ItemStack>();
+        List<ItemStack> result = new ArrayList<>();
         for (String id : parts) {
             if (AutoSort.customMatGroups.containsKey(id)) {
                 result.addAll(AutoSort.customMatGroups.get(id));

@@ -21,6 +21,7 @@ import plugin.arcwolf.autosort.network.SortNetwork;
 import java.util.*;
 import java.util.Map.Entry;
 
+@SuppressWarnings({"ConstantConditions", "BooleanMethodIsAlwaysInverted", "UnusedReturnValue", "SameReturnValue"})
 public class CommandHandler {
 
     private AutoSort plugin;
@@ -112,8 +113,8 @@ public class CommandHandler {
             }
             if (args.length > 1) {
                 String groupName = args[0].toUpperCase();
-                List<ItemStack> matList = new ArrayList<ItemStack>();
-                List<String> ids = new ArrayList<String>();
+                List<ItemStack> matList = new ArrayList<>();
+                List<String> ids = new ArrayList<>();
                 for (int i = 1; i < args.length; i++) {
                     String mat = args[i];
                     if (Util.parseMaterialID(mat) != null) {
@@ -153,7 +154,7 @@ public class CommandHandler {
                                     String modArg = args[i].substring(1);
                                     ItemStack parsedItem = Util.parseMaterialID(modArg);
                                     if (parsedItem == null) continue;
-                                    if (item.getTypeId() == parsedItem.getTypeId() && item.getDurability() == parsedItem.getDurability())
+                                    if (item.getType() == parsedItem.getType() && item.getDurability() == parsedItem.getDurability())
                                         itms.remove();
                                 }
                             } else {
@@ -161,7 +162,7 @@ public class CommandHandler {
                             }
                         }
                     }
-                    List<String> ids = new ArrayList<String>();
+                    List<String> ids = new ArrayList<>();
                     for (ItemStack is : matList) {
                         if (is.getData().getData() == 0)
                             ids.add("" + is.getTypeId());
@@ -453,37 +454,33 @@ public class CommandHandler {
     }
 
     private void reload(final CommandSender sender) {
-        Bukkit.getScheduler().runTaskLater(plugin, new Runnable() {
+        Bukkit.getScheduler().runTaskLater(plugin, () -> {
+            try {
+                sender.sendMessage(ChatColor.AQUA + "AutoSort reloading...");
+                CustomPlayer.playerSettings.clear();
+                plugin.items.clear();
+                plugin.stillItems.clear();
+                plugin.allNetworkBlocks.clear();
+                plugin.networks.clear();
+                plugin.sortBlocks.clear();
+                plugin.depositBlocks.clear();
+                plugin.withdrawBlocks.clear();
+                AutoSort.customMatGroups.clear();
+                AutoSort.proximities.clear();
+                sender.sendMessage(ChatColor.YELLOW + "AutoSort variables cleared.");
 
-            @Override
-            public void run() {
-                try {
-                    sender.sendMessage(ChatColor.AQUA + "AutoSort reloading...");
-                    CustomPlayer.playerSettings.clear();
-                    plugin.items.clear();
-                    plugin.stillItems.clear();
-                    plugin.allNetworkBlocks.clear();
-                    plugin.networks.clear();
-                    plugin.sortBlocks.clear();
-                    plugin.depositBlocks.clear();
-                    plugin.withdrawBlocks.clear();
-                    AutoSort.customMatGroups.clear();
-                    AutoSort.proximities.clear();
-                    sender.sendMessage(ChatColor.YELLOW + "AutoSort variables cleared.");
-
-                    plugin.loadConfig();
-                    sender.sendMessage(ChatColor.YELLOW + "AutoSort config reloaded.");
-                    plugin.loadCustomGroups();
-                    sender.sendMessage(ChatColor.YELLOW + "AutoSort custom groups reloaded.");
-                    plugin.loadInventoryBlocks();
-                    sender.sendMessage(ChatColor.YELLOW + "AutoSort inventory block list reloaded.");
-                    plugin.loadDatabase();
-                    sender.sendMessage(ChatColor.YELLOW + "AutoSort database reloaded.");
-                    sender.sendMessage(ChatColor.GREEN + "AutoSort reload finished successfully.");
-                } catch (Exception e) {
-                    e.printStackTrace();
-                    sender.sendMessage(ChatColor.RED + "AutoSort reload failed.");
-                }
+                plugin.loadConfig();
+                sender.sendMessage(ChatColor.YELLOW + "AutoSort config reloaded.");
+                plugin.loadCustomGroups();
+                sender.sendMessage(ChatColor.YELLOW + "AutoSort custom groups reloaded.");
+                plugin.loadInventoryBlocks();
+                sender.sendMessage(ChatColor.YELLOW + "AutoSort inventory block list reloaded.");
+                plugin.loadDatabase();
+                sender.sendMessage(ChatColor.YELLOW + "AutoSort database reloaded.");
+                sender.sendMessage(ChatColor.GREEN + "AutoSort reload finished successfully.");
+            } catch (Exception e) {
+                e.printStackTrace();
+                sender.sendMessage(ChatColor.RED + "AutoSort reload failed.");
             }
         }, 0);
     }
@@ -557,8 +554,8 @@ public class CommandHandler {
         } else if (commandName.equalsIgnoreCase("addasgroup")) {
             if (args.length > 1) {
                 String groupName = args[0].toUpperCase();
-                List<ItemStack> matList = new ArrayList<ItemStack>();
-                List<String> ids = new ArrayList<String>();
+                List<ItemStack> matList = new ArrayList<>();
+                List<String> ids = new ArrayList<>();
                 for (int i = 1; i < args.length; i++) {
                     String mat = args[i];
                     if (Util.parseMaterialID(mat) != null) {
@@ -578,7 +575,7 @@ public class CommandHandler {
             if (args.length > 1) {
                 String groupName = args[0].toUpperCase();
                 if (AutoSort.customMatGroups.containsKey(groupName)) {
-                    List<ItemStack> matList = new ArrayList<ItemStack>();
+                    List<ItemStack> matList = new ArrayList<>();
                     for (int i = 1; i < args.length; i++) {
                         String mat = args[i];
                         if (Util.parseMaterialID(mat) != null) {
@@ -587,7 +584,7 @@ public class CommandHandler {
                             sender.sendMessage(ChatColor.RED + "Invalid Material: " + mat);
                         }
                     }
-                    List<String> ids = new ArrayList<String>();
+                    List<String> ids = new ArrayList<>();
                     for (ItemStack is : matList) {
                         if (is.getData().getData() == 0)
                             ids.add("" + is.getTypeId());
@@ -683,7 +680,7 @@ public class CommandHandler {
             return false;
         } else if (checkIfInUse(player, network)) return false;
 
-        List<Block> netItemsToDel = new ArrayList<Block>();
+        List<Block> netItemsToDel = new ArrayList<>();
         for (Entry<Block, NetworkItem> wchest : network.withdrawChests.entrySet()) {
             if (wchest.getValue().network.equals(network)) {
                 plugin.allNetworkBlocks.remove(wchest.getValue().chest);
@@ -727,180 +724,40 @@ public class CommandHandler {
     }
 
     private void updateSign(final Block sign, final String netName, final String whoDeleted) {
-        scheduler.runTask(plugin, new Runnable() {
-
-            @Override
-            public void run() {
-                if (sign.getType().equals(Material.WALL_SIGN) || sign.getType().equals(Material.SIGN_POST)) {
-                    BlockState sgn = sign.getState();
-                    Sign s = (Sign) sign.getState();
-                    s.setLine(0, "�e[ " + netName + " ]");
-                    s.setLine(1, "�edeleted by");
-                    s.setLine(2, "�e" + whoDeleted);
-                    s.setLine(3, "");
-                    sgn.update(true);
-                    s.update(true);
-                }
+        scheduler.runTask(plugin, () -> {
+            if (sign.getType().equals(Material.WALL_SIGN) || sign.getType().equals(Material.SIGN_POST)) {
+                BlockState sgn = sign.getState();
+                Sign s = (Sign) sign.getState();
+                s.setLine(0, "�e[ " + netName + " ]");
+                s.setLine(1, "�edeleted by");
+                s.setLine(2, "�e" + whoDeleted);
+                s.setLine(3, "");
+                sgn.update(true);
+                s.update(true);
             }
         });
     }
 
     private String getTrueMaterial(ItemStack item) {
-        int itemData = 0;
-        int itemId = 0;
-        if (item != null) {
-            itemId = item.getTypeId();
-            itemData = item.getData().getData();
-        } else
-            return "";
-        if (itemId == 5) {
-            if (itemData == 0) return item.getType().name();
-            if (itemData == 1) return "SPRUCE_WOOD";
-            if (itemData == 2) return "BIRCH_WOOD";
-            if (itemData == 3)
-                return "JUNGLE_WOOD";
-            else
-                return "WOOD_" + itemData;
-        }
-        if (itemId == 6) {
-            if (itemData == 0) return item.getType().name();
-            if (itemData == 1) return "SPRUCE_SAPLING";
-            if (itemData == 2) return "BIRCH_SAPLING";
-            if (itemData == 3)
-                return "JUNGLE_SAPLING";
-            else
-                return "SAPLING_" + itemData;
-        }
-        if (itemId == 17) {
-            if (itemData == 0) return item.getType().name();
-            if (itemData == 1) return "SPRUCE_LOG";
-            if (itemData == 2) return "BIRCH_LOG";
-            if (itemData == 3)
-                return "JUNGLE_LOG";
-            else
-                return "LOG_" + itemData;
-        }
-        if (itemId == 18) {
-            if (itemData == 0) return item.getType().name();
-            if (itemData == 1) return "SPRUCE_LEAVES";
-            if (itemData == 2) return "BIRCH_LEAVES";
-            if (itemData == 3)
-                return "JUNGLE_LEAVES";
-            else
-                return "LEAVES_" + itemData;
-        }
-        if (itemId == 24) {
-            if (itemData == 0) return item.getType().name();
-            if (itemData == 1) return "SANDSTONE_CHISELED";
-            if (itemData == 2) return "SANDSTONE_SMOOTH";
-        }
-        if (itemId == 31) {
-            if (itemData == 0) return "SHRUB";
-            if (itemData == 1) return "GRASS";
-            if (itemData == 2) return "FERN";
-        }
-        if (itemId == 35 || itemId == 159 || itemId == 171) {
-            String type = "";
-            if (itemId == 35)
-                type = "_WOOL";
-            else if (itemId == 159)
-                type = "_CLAY";
-            else
-                type = "_CARPET";
-            if (itemData == 0) return item.getType().name();
-            if (itemData == 1) return "ORANGE" + type;
-            if (itemData == 2) return "MAGENTA" + type;
-            if (itemData == 3) return "LIGHT_BLUE" + type;
-            if (itemData == 4) return "YELLOW" + type;
-            if (itemData == 5) return "LIME" + type;
-            if (itemData == 6) return "PINK" + type;
-            if (itemData == 7) return "GRAY" + type;
-            if (itemData == 8) return "LIGHT_GRAY" + type;
-            if (itemData == 9) return "CYAN" + type;
-            if (itemData == 10) return "PURPLE" + type;
-            if (itemData == 11) return "BLUE" + type;
-            if (itemData == 12) return "BROWN" + type;
-            if (itemData == 13) return "GREEN" + type;
-            if (itemData == 14) return "RED" + type;
-            if (itemData == 15) return "BLACK" + type;
-        }
-        if (itemId == 43 || itemId == 44) {
-            String type = "";
-            String end = "_STEP";
-            if (itemId == 43) type = "DOUBLE_";
-            if (itemData == 0) return item.getType().name();
-            if (itemData == 1) return type + "SANDSTONE" + end;
-            if (itemData == 2) return type + "WOODSTONE" + end;
-            if (itemData == 3) return type + "COBBLE" + end;
-            if (itemData == 4) return type + "BRICK" + end;
-            if (itemData == 5) return type + "STONEBRICK" + end;
-            if (itemData == 6) return type + "NETHER" + end;
-            if (itemData == 7) return type + "QUARTZ" + end;
-            if (itemData == 8) return type + "SMOOTH_STONE" + end;
-            if (itemData == 9) return type + "SMOOTH_SANDSTONE" + end;
-            if (itemData == 15) return type + "TILE_QUARTZ" + end;
-        }
-        if (itemId == 98) {
-            if (itemData == 0) return item.getType().name();
-            if (itemData == 1) return "MOSSY_STONEBRICK";
-            if (itemData == 2) return "CRACK_STONEBRICK";
-            if (itemData == 3) return "CHISELED_STONEBRICK";
-        }
-        if (itemId == 125 || itemId == 126) {
-            String type = "";
-            String end = "_SLAB";
-            if (itemId == 125) type = "DOUBLE_";
-            if (itemId == 126) type = "SINGLE_";
-            if (itemData == 0) return item.getType().name();
-            if (itemData == 1) return type + "SPRUCE" + end;
-            if (itemData == 2) return type + "BIRCH" + end;
-            if (itemData == 3) return type + "JUNGLE" + end;
-        }
-        if (itemId == 263) {
-            if (itemData == 0) return "COAL";
-            if (itemData == 1) return "CHARCOAL";
-        }
-        if (itemId == 351) {
-            if (itemData == 0) return item.getType().name();
-            if (itemData == 1) return "RED_DYE";
-            if (itemData == 2) return "CACTUS_GREEN";
-            if (itemData == 3) return "COCOA_BEANS";
-            if (itemData == 4) return "LAPIS_LAZULI";
-            if (itemData == 5) return "PURPLE_DYE";
-            if (itemData == 6) return "CYAN_DYE";
-            if (itemData == 7) return "LIGHT_GRAY_DYE";
-            if (itemData == 8) return "GRAY_DYE";
-            if (itemData == 9) return "PINK_DYE";
-            if (itemData == 10) return "LIME_DYE";
-            if (itemData == 11) return "YELLOW_DYE";
-            if (itemData == 12) return "LIGHT_BLUE_DYE";
-            if (itemData == 13) return "MAGENTA_DYE";
-            if (itemData == 14) return "ORANGE_DYE";
-            if (itemData == 15) return "BONE_MEAL";
-        }
         return item.getType().name();
     }
 
     private void sortPlayerInventory(final int startIndex, final CommandSender sender, final String owner, final String netName, final SortNetwork net) {
-        scheduler.runTask(plugin, new Runnable() {
-
-            @Override
-            public void run() {
-                Player player = (Player) sender;
-                Inventory inv = player.getInventory();
-                ItemStack[] contents = inv.getContents();
-                ItemStack is;
-                for (int i = startIndex; i < contents.length; i++) {
-                    is = contents[i];
-                    if (is != null) {
-                        if (net.sortItem(is)) {
-                            contents[i] = null;
-                        }
+        scheduler.runTask(plugin, () -> {
+            Player player = (Player) sender;
+            Inventory inv = player.getInventory();
+            ItemStack[] contents = inv.getContents();
+            ItemStack is;
+            for (int i = startIndex; i < contents.length; i++) {
+                is = contents[i];
+                if (is != null) {
+                    if (net.sortItem(is)) {
+                        contents[i] = null;
                     }
                 }
-                inv.setContents(contents);
-                sender.sendMessage(ChatColor.GREEN + "Inventory sorted into " + ChatColor.YELLOW + netName + ChatColor.WHITE + " owned by " + ChatColor.YELLOW + owner);
             }
+            inv.setContents(contents);
+            sender.sendMessage(ChatColor.GREEN + "Inventory sorted into " + ChatColor.YELLOW + netName + ChatColor.WHITE + " owned by " + ChatColor.YELLOW + owner);
         });
     }
 
@@ -930,19 +787,15 @@ public class CommandHandler {
         settings.playerName = player.getName();
         settings.sortNetwork = network;
         settings.withdrawInventory = Bukkit.createInventory(null, 54, netName + " network inventory");
-        scheduler.runTask(plugin, new Runnable() {
-
-            @Override
-            public void run() {
-                if (plugin.util.updateInventoryList(player, settings)) {
-                    Collections.sort(settings.inventory, new StringComparator());
-                    plugin.util.updateChestInventory(player, settings);
-                    player.openInventory(settings.withdrawInventory);
-                } else {
-                    player.sendMessage("The network - " + ChatColor.YELLOW + netName + ChatColor.WHITE + " - is empty.");
-                    plugin.asListener.chestLock.remove(player.getName());
-                    settings.clearPlayer();
-                }
+        scheduler.runTask(plugin, () -> {
+            if (plugin.util.updateInventoryList(player, settings)) {
+                settings.inventory.sort(new StringComparator());
+                plugin.util.updateChestInventory(player, settings);
+                player.openInventory(settings.withdrawInventory);
+            } else {
+                player.sendMessage("The network - " + ChatColor.YELLOW + netName + ChatColor.WHITE + " - is empty.");
+                plugin.asListener.chestLock.remove(player.getName());
+                settings.clearPlayer();
             }
         });
         return true;

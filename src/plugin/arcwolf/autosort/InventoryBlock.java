@@ -1,5 +1,6 @@
 package plugin.arcwolf.autosort;
 
+@SuppressWarnings("CanBeFinal")
 public class InventoryBlock {
 
     private int itemId, dataValue;
@@ -44,7 +45,6 @@ public class InventoryBlock {
         InventoryBlock other = (InventoryBlock) obj;
         if (dataValue != other.dataValue) return false;
         if (itemId != other.itemId) return false;
-        if (usedataValue != other.usedataValue) return false;
-        return true;
+        return usedataValue == other.usedataValue;
     }
 }

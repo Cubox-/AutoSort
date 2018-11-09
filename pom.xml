@@ -20,10 +20,6 @@
             <id>bukkit-repo</id>
             <url>http://hub.spigotmc.org/nexus/content/repositories/snapshots/</url>
         </repository>
-        <repository>
-            <id>vault-repo</id>
-            <url>http://nexus.hc.to/content/repositories/pub_releases</url>
-        </repository>
     </repositories>
 
     <dependencies>
@@ -31,19 +27,6 @@
             <groupId>org.bukkit</groupId>
             <artifactId>bukkit</artifactId>
             <version>1.12.2-R0.1-SNAPSHOT</version>
-        </dependency>
-        <dependency>
-            <groupId>com.bergerkiller.bukkit.common.internal.CommonPlugin</groupId>
-            <artifactId>bkcommonlib</artifactId>
-            <version>1.13.1-v4</version>
-            <scope>system</scope>
-            <systemPath>${project.basedir}/lib/BKCommonLib-1.13.1-v4.jar</systemPath>
-        </dependency>
-        <dependency>
-            <groupId>net.milkbowl.vault</groupId>
-            <artifactId>VaultAPI</artifactId>
-            <version>1.6</version>
-            <scope>provided</scope>
         </dependency>
     </dependencies>
 

@@ -31,14 +31,17 @@ import plugin.arcwolf.autosort.network.SortNetwork;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map.Entry;
+import java.util.Objects;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
+@SuppressWarnings({"BooleanMethodIsAlwaysInverted", "UnnecessaryReturnStatement", "ConstantConditions"})
 public class AutoSortListener implements Listener {
 
-    public ConcurrentHashMap<String, SortNetwork> chestLock = new ConcurrentHashMap<String, SortNetwork>();
+    public ConcurrentHashMap<String, SortNetwork> chestLock = new ConcurrentHashMap<>();
     private AutoSort plugin;
 
+    @SuppressWarnings("unused")
     public AutoSortListener(AutoSort autoSort) {
         plugin = autoSort;
     }
@@ -64,7 +67,7 @@ public class AutoSortListener implements Listener {
                 }
             }
         } else if (block.getType().equals(Material.DROPPER)) {
-            List<Block> blocksToTest = new ArrayList<Block>();
+            List<Block> blocksToTest = new ArrayList<>();
             blocksToTest.add(block.getRelative(BlockFace.UP));
             blocksToTest.add(block.getRelative(BlockFace.NORTH));
             blocksToTest.add(block.getRelative(BlockFace.SOUTH));
@@ -85,7 +88,7 @@ public class AutoSortListener implements Listener {
                 List<Block> blocksToTest = getBlocksToTest(hopper.getData(), hopper);
                 for (Block blockToTest : blocksToTest)
                     if (block.getLocation().equals(blockToTest.getLocation())) {
-                        List<Block> testBlock = new ArrayList<Block>();
+                        List<Block> testBlock = new ArrayList<>();
                         testBlock.add(hopper);
                         if (hopperDropperStopper(testBlock, player))
                             event.setCancelled(true);
@@ -98,10 +101,11 @@ public class AutoSortListener implements Listener {
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onItemSpawn(ItemSpawnEvent event) {
         if (event.isCancelled()) return;
-        Item item = (Item) event.getEntity();
+        Item item = event.getEntity();
         plugin.items.add(item);
     }
 
+    @SuppressWarnings("unused")
     @EventHandler(priority = EventPriority.LOWEST)
     public void onInventoryClose(InventoryCloseEvent event) {
         if (!(event.getPlayer() instanceof Player)) return;
@@ -110,6 +114,7 @@ public class AutoSortListener implements Listener {
         plugin.util.restoreWithdrawnInv(settings, player);
     }
 
+    @SuppressWarnings("unused")
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onInventoryOpen(InventoryOpenEvent event) {
         if (event.isCancelled()) return;
@@ -151,6 +156,7 @@ public class AutoSortListener implements Listener {
             } else
                 return;
         }
+        //noinspection ConstantConditions
         if (block == null || player == null || sortNetwork == null) return;
         String netName = sortNetwork.netName;
         UUID owner = sortNetwork.owner;
@@ -186,7 +192,8 @@ public class AutoSortListener implements Listener {
                         settings.startItemIdx--;
                     else
                         settings.startItemIdx = maxStartIdx - 1;
-                } else if (clickedId == 8) {
+                } else //noinspection ConstantConditions
+                    if (clickedId == 8) {
                     if (settings.startItemIdx < maxStartIdx - 1)
                         settings.startItemIdx++;
                     else
@@ -233,6 +240,7 @@ public class AutoSortListener implements Listener {
         }
     }
 
+    @SuppressWarnings("unused")
     @EventHandler(priority = EventPriority.LOWEST)
     public void onPlayerLogin(PlayerLoginEvent event) {
         Player player = event.getPlayer();
@@ -243,13 +251,14 @@ public class AutoSortListener implements Listener {
         settings.clearPlayer();
     }
 
+    @SuppressWarnings("unused")
     @EventHandler(priority = EventPriority.LOWEST)
     public void onPlayerQuit(PlayerQuitEvent event) {
         Player player = event.getPlayer();
         String playerName = "";
         CustomPlayer settings = CustomPlayer.getSettings(player);
         playerName = settings.playerName;
-        if (playerName != "") {
+        if (!Objects.equals(playerName, "")) {
             plugin.util.restoreWithdrawnInv(settings, player);
         }
     }
@@ -327,7 +336,7 @@ public class AutoSortListener implements Listener {
                         if (plugin.util.isValidWithdrawBlock(storageBlock) && !(storageBlock.getState() instanceof InventoryHolder)) {
                             player.sendMessage(ChatColor.RED + "This inventory block is not registered with Craftbukkit.");
                             player.sendMessage(ChatColor.RED + "It will not fire inventory events and so can NOT be used as a withdraw chest.");
-                            AutoSort.LOGGER.warning(plugin.getName() + ": Block Id " + storageBlock.getTypeId() + " is not a valid withdraw chest.");
+                            AutoSort.LOGGER.warning(plugin.getName() + ": Block Id " + storageBlock.getType().name() + " is not a valid withdraw chest.");
                             AutoSort.LOGGER.warning(plugin.getName() + ": Edit config to remove.");
                         }
                         event.setCancelled(true);
@@ -508,6 +517,7 @@ public class AutoSortListener implements Listener {
         }
     }
 
+    @SuppressWarnings("unused")
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onBlockBreak(BlockBreakEvent event) {
         if (event.isCancelled()) return;
@@ -718,7 +728,7 @@ public class AutoSortListener implements Listener {
     }
 
     private List<Block> getBlocksToTest(int blockData, Block block) {
-        List<Block> blocksToTest = new ArrayList<Block>();
+        List<Block> blocksToTest = new ArrayList<>();
         switch (blockData) {
             case 0:
                 blocksToTest.add(block.getRelative(BlockFace.UP));
@@ -759,7 +769,7 @@ public class AutoSortListener implements Listener {
     }
 
     private boolean isValidSign(Block block) {
-        return block.getType().equals(Material.WALL_SIGN) || block.getType().equals(Material.SIGN_POST);
+        return block.getType().equals(Material.WALL_SIGN);
     }
 
     private Block getDirection(String dStr, Block signBlock) {
@@ -771,7 +781,7 @@ public class AutoSortListener implements Listener {
         World world = loc.getWorld();
         String dir;
         for (int i = 0; i < dStr.length(); i++) {
-            dir = new Character(dStr.charAt(i)).toString();
+            dir = Character.toString(dStr.charAt(i));
             if (dir.equalsIgnoreCase("L")) {
                 switch (attached) {
                     case SOUTH:
@@ -873,33 +883,13 @@ public class AutoSortListener implements Listener {
 
     private boolean isValid(String str) {
         if (str != null) {
-            if (str.contains(":")) {
-                String[] parts = str.split(":");
-                if (parts.length == 2) {
-                    String sid = parts[0];
-                    String sdam = parts[1];
-                    if (Util.isNumeric(sid) && Util.isNumeric(sdam)) {
-                        int id = Integer.parseInt(sid);
-                        Material mat = Material.getMaterial(id);
-                        if (mat != null) {
-                            return true;
-                        }
-                    }
-                }
-            } else if (Util.isNumeric(str)) {
-                Material mat = Material.getMaterial(Integer.parseInt(str));
-                if (mat != null) {
-                    return true;
-                }
-            } else if (str.equalsIgnoreCase("MISC")) {
+            if (str.equalsIgnoreCase("MISC")) {
                 return true;
             } else if (AutoSort.customMatGroups.containsKey(str)) {
                 return true;
             } else {
-                Material mat = Material.getMaterial(str);
-                if (mat != null) {
-                    return true;
-                }
+                Material mat = Material.matchMaterial(str);
+                return mat != null;
             }
         }
         return false;
@@ -923,7 +913,7 @@ public class AutoSortListener implements Listener {
         if (plugin.networks.containsKey(ownerId)) {
             plugin.networks.get(ownerId).add(newNet);
         } else {
-            ArrayList<SortNetwork> networks = new ArrayList<SortNetwork>();
+            ArrayList<SortNetwork> networks = new ArrayList<>();
             networks.add(newNet);
             plugin.networks.put(ownerId, networks);
         }

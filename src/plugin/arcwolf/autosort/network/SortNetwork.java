@@ -17,7 +17,7 @@ public class SortNetwork {
      *      TrapChest / Double
      *      DropSign
      *      Hopper
-     *      Furnace / Burning Furnace
+     *      Furnace
      *      
      * WithdrawChest
      *      Chest
@@ -31,14 +31,14 @@ public class SortNetwork {
      */
 
     public UUID owner = null;
-    public List<UUID> members = new ArrayList<UUID>();
+    public List<UUID> members = new ArrayList<>();
     public String netName = "";
     public String world = "";
 
-    public List<SortChest> sortChests = new ArrayList<SortChest>();
-    public Map<Block, NetworkItem> depositChests = new HashMap<Block, NetworkItem>();
-    public Map<Block, NetworkItem> withdrawChests = new HashMap<Block, NetworkItem>();
-    public Map<Block, NetworkItem> dropSigns = new HashMap<Block, NetworkItem>();
+    public List<SortChest> sortChests = new ArrayList<>();
+    public Map<Block, NetworkItem> depositChests = new HashMap<>();
+    public Map<Block, NetworkItem> withdrawChests = new HashMap<>();
+    public Map<Block, NetworkItem> dropSigns = new HashMap<>();
 
     /**
      * @param owner
@@ -60,7 +60,7 @@ public class SortNetwork {
 
     public boolean sortItem(ItemStack item) { // Sort Chests by emptiest first
         if (AutoSort.emptiesFirst)
-            Collections.sort(sortChests, new amountComparator(item));
+            sortChests.sort(new amountComparator(item));
         return sortItem(item, 4);
     }
 

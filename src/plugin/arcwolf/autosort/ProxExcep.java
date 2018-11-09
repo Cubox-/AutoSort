@@ -22,6 +22,7 @@ public class ProxExcep {
     /**
      * @return the owner
      */
+    @SuppressWarnings("unused")
     public UUID getOwner() {
         return owner;
     }
@@ -29,6 +30,7 @@ public class ProxExcep {
     /**
      * @return the network
      */
+    @SuppressWarnings("unused")
     public String getNetwork() {
         return network;
     }

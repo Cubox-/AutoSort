@@ -1,7 +1,5 @@
 package plugin.arcwolf.autosort;
 
-import com.bergerkiller.bukkit.common.conversion.Conversion;
-import com.bergerkiller.reflection.net.minecraft.server.NMSTileEntity;
 import org.bukkit.*;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
@@ -23,6 +21,7 @@ public class Util {
 
     private static AutoSort plugin;
 
+    @SuppressWarnings("unused")
     public Util(AutoSort plugin) {
         Util.plugin = plugin;
     }
@@ -49,31 +48,10 @@ public class Util {
 
     public static ItemStack parseMaterialID(String str) {
         if (str != null) {
-            if (str.contains(":")) {
-                String[] parts = str.split(":");
-                String sid = parts[0];
-                String sdam = parts[1];
-                if (isNumeric(sid) && isNumeric(sdam)) {
-                    int id = Integer.parseInt(sid);
-                    short dam = Short.parseShort(sdam);
-                    Material mat = Material.getMaterial(id);
-                    if (mat != null) {
-                        if (dam == 0) {
-                            return new ItemStack(mat, 1);
-                        } else {
-                            return new ItemStack(mat, 1, dam);
-                        }
-                    }
-                }
-            } else if (isNumeric(str)) {
-                Material mat = Material.getMaterial(Integer.parseInt(str));
-                if (mat != null) {
-                    return new ItemStack(mat, 1);
-                }
-            } else if (str.equalsIgnoreCase("MISC")) {
+            if (str.equalsIgnoreCase("MISC")) {
                 return new ItemStack(Material.AIR);
             } else {
-                Material mat = Material.getMaterial(str.toUpperCase());
+                Material mat = Material.matchMaterial(str);
                 if (mat != null) {
                     return new ItemStack(mat, 1);
                 }
@@ -105,34 +83,8 @@ public class Util {
             return tryNMSInventory(block);
     }
 
+    @SuppressWarnings("unused")
     private static Inventory tryNMSInventory(Block block) {
-        Plugin p = plugin.getServer().getPluginManager().getPlugin("BKCommonLib");
-        if (p != null) {
-            if (AutoSort.bkError) {
-                AutoSort.LOGGER.info(plugin.getName() + ": BKCommonLib detected, attempting custom inventory access.");
-            }
-            AutoSort.bkError = false;
-            Inventory i = null;
-            try {
-                if (block == null) return null;
-                Object tileEntity = NMSTileEntity.getFromWorld(block);
-                i = Conversion.toInventory.convert(tileEntity);
-            } catch (Exception e) {
-                if (AutoSort.getDebug() == 2) {
-                    AutoSort.LOGGER.warning(plugin.getName() + ": unknown inventory type");
-                    e.printStackTrace();
-                    AutoSort.LOGGER.warning("----------------------------");
-                }
-            }
-            return i;
-        } else {
-            if (!AutoSort.bkError) {
-                AutoSort.bkError = true;
-                AutoSort.LOGGER.warning(plugin.getName() + ": Can't access custom inventories without BKCommonLib Loaded.");
-                AutoSort.LOGGER.warning(plugin.getName() + ": BKCommonLib can be found at:");
-                AutoSort.LOGGER.warning(plugin.getName() + ": http://dev.bukkit.org/bukkit-plugins/bkcommonlib/");
-            }
-        }
         return null;
     }
 
@@ -187,6 +139,7 @@ public class Util {
         }
     }
 
+    @SuppressWarnings("unused")
     public Block findSign(Block block) {
         BlockFace[] surchest = {BlockFace.SELF, BlockFace.NORTH, BlockFace.EAST, BlockFace.SOUTH, BlockFace.WEST};
         for (BlockFace face : surchest) {
@@ -231,9 +184,8 @@ public class Util {
                     if (networkItem.equals(wantedItem)) {
                         int foundAmount = networkItem.getAmount();
                         Inventory withdrawInv = settings.withdrawInventory;
-                        ItemStack stack = networkItem;
                         if (wantedAmount >= foundAmount && foundAmount != 0) { // Found amount and was less then wanted
-                            couldntFit = withdrawInv.addItem(stack);
+                            couldntFit = withdrawInv.addItem(networkItem);
                             if (couldntFit != null && !couldntFit.isEmpty()) {
                                 return false;
                             }
@@ -242,7 +194,7 @@ public class Util {
                             networkInv.clear(idx);
                         } else if (wantedAmount != 0 && wantedAmount < foundAmount) { // Found amount and was more then wanted
                             while (wantedAmount > 0) {
-                                couldntFit = withdrawInv.addItem(stack);
+                                couldntFit = withdrawInv.addItem(networkItem);
                                 if (couldntFit != null && !couldntFit.isEmpty()) {
                                     return false;
                                 }
@@ -303,6 +255,7 @@ public class Util {
         }
     }
 
+    @SuppressWarnings("WeakerAccess")
     public boolean tooManyItems(Player player, CustomPlayer settings) {
         boolean tooManyItems = false;
         Inventory inv = settings.withdrawInventory;
@@ -338,12 +291,9 @@ public class Util {
     }
 
     public void updateChestTask(final Player player, final CustomPlayer settings) {
-        plugin.getServer().getScheduler().scheduleSyncDelayedTask(plugin, new Runnable() {
-
-            public void run() {
-                if (settings.withdrawInventory != null)
-                    plugin.util.updateChestInventory(player, settings);
-            }
+        plugin.getServer().getScheduler().scheduleSyncDelayedTask(plugin, () -> {
+            if (settings.withdrawInventory != null)
+                plugin.util.updateChestInventory(player, settings);
         }, 3);
     }
 

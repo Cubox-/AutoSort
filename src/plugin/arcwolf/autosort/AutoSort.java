@@ -1,6 +1,5 @@
 package plugin.arcwolf.autosort;
 
-import net.milkbowl.vault.permission.Permission;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Server;
@@ -44,6 +43,7 @@ import java.util.logging.Logger;
  * 3 = UUID search errors
  */
 
+@SuppressWarnings("ConstantConditions")
 public class AutoSort extends JavaPlugin {
 
     public static final int SAVEVERSION = 6;
@@ -52,20 +52,20 @@ public class AutoSort extends JavaPlugin {
     public static boolean ONLINE_UUID_CHECK = true;
     public static int httpConnectTimeout = 15000;
     public static int httpReadTimeout = 15000;
-    public static ConcurrentHashMap<String, List<ItemStack>> customMatGroups = new ConcurrentHashMap<String, List<ItemStack>>();
-    public static Map<UUID, ProxExcep> proximities = new HashMap<UUID, ProxExcep>();
+    public static ConcurrentHashMap<String, List<ItemStack>> customMatGroups = new ConcurrentHashMap<>();
+    public static Map<UUID, ProxExcep> proximities = new HashMap<>();
     public static int defaultProx = 0;
     public static boolean bkError = false;
     public static boolean emptiesFirst = true;
     public static boolean keepPriority = false;
     private static int debug = 0;
-    public List<Item> items = new ArrayList<Item>();
-    public List<Item> stillItems = new ArrayList<Item>();
-    public ConcurrentHashMap<Block, SortNetwork> allNetworkBlocks = new ConcurrentHashMap<Block, SortNetwork>();
-    public ConcurrentHashMap<UUID, List<SortNetwork>> networks = new ConcurrentHashMap<UUID, List<SortNetwork>>();
-    public Map<InventoryBlock, InventoryBlock> sortBlocks = new HashMap<InventoryBlock, InventoryBlock>();
-    public Map<InventoryBlock, InventoryBlock> depositBlocks = new HashMap<InventoryBlock, InventoryBlock>();
-    public Map<InventoryBlock, InventoryBlock> withdrawBlocks = new HashMap<InventoryBlock, InventoryBlock>();
+    public List<Item> items = new ArrayList<>();
+    public List<Item> stillItems = new ArrayList<>();
+    public ConcurrentHashMap<Block, SortNetwork> allNetworkBlocks = new ConcurrentHashMap<>();
+    public ConcurrentHashMap<UUID, List<SortNetwork>> networks = new ConcurrentHashMap<>();
+    public Map<InventoryBlock, InventoryBlock> sortBlocks = new HashMap<>();
+    public Map<InventoryBlock, InventoryBlock> depositBlocks = new HashMap<>();
+    public Map<InventoryBlock, InventoryBlock> withdrawBlocks = new HashMap<>();
     public boolean UUIDLoaded = false;
     public boolean worldRestrict = false;
     public AutoSortListener asListener;
@@ -73,13 +73,10 @@ public class AutoSort extends JavaPlugin {
     private boolean uuidprecache = false;
     private Server server;
     private BukkitScheduler scheduler;
-    private PluginDescriptionFile pdfFile;
-    private PluginManager pm;
-    private String pluginName;
+private String pluginName;
     private FileConfiguration customConfig = null;
     private File customConfigFile = null;
     private CommandHandler commandHandler;
-    private Permission vaultPerms;
     private boolean permissionsEr = false;
     private boolean permissionsSet = false;
 
@@ -90,9 +87,9 @@ public class AutoSort extends JavaPlugin {
     public void onEnable() {
         server = this.getServer();
         scheduler = server.getScheduler();
-        pdfFile = getDescription();
+        PluginDescriptionFile pdfFile = getDescription();
         pluginName = pdfFile.getName();
-        pm = server.getPluginManager();
+        PluginManager pm = server.getPluginManager();
         util = new Util(this);
 
         asListener = new AutoSortListener(this);
@@ -103,13 +100,9 @@ public class AutoSort extends JavaPlugin {
         getPermissionsPlugin();
         loadCustomGroups();
         loadInventoryBlocks();
-        scheduler.runTaskLater(this, new Runnable() {
-
-            @Override
-            public void run() {
-                loadDatabase();
-                LOGGER.info(pluginName + ": Autosort Database Loaded...");
-            }
+        scheduler.runTaskLater(this, () -> {
+            loadDatabase();
+            LOGGER.info(pluginName + ": Autosort Database Loaded...");
         }, 1);
 
         pm.registerEvents(asListener, this);
@@ -126,22 +119,10 @@ public class AutoSort extends JavaPlugin {
 
     public boolean onCommand(final CommandSender sender, final Command cmd, final String commandLabel, final String[] args) {
         if (sender instanceof Player) {
-            scheduler.runTaskAsynchronously(this, new Runnable() {
-
-                @Override
-                public void run() {
-                    commandHandler.inGame(sender, cmd, commandLabel, args);
-                }
-            });
+            scheduler.runTaskAsynchronously(this, () -> commandHandler.inGame(sender, cmd, commandLabel, args));
             return true;
         } else {
-            scheduler.runTaskAsynchronously(this, new Runnable() {
-
-                @Override
-                public void run() {
-                    commandHandler.inConsole(sender, cmd, commandLabel, args);
-                }
-            });
+            scheduler.runTaskAsynchronously(this, () -> commandHandler.inConsole(sender, cmd, commandLabel, args));
             return true;
         }
     }
@@ -155,14 +136,7 @@ public class AutoSort extends JavaPlugin {
     public boolean hasPermission(Player player, String permission) {
         getPermissionsPlugin();
         if (debug == 1) {
-            if (vaultPerms != null) {
-                String pName = player.getName();
-                String gName = vaultPerms.getPrimaryGroup(player);
-                //Boolean permissions = vaultPerms.has(player, permission);
-                boolean permissions = player.hasPermission(permission);
-                LOGGER.info("Vault permissions, group for '" + pName + "' = " + gName);
-                LOGGER.info("Permission for " + permission + " is " + permissions);
-            } else if (server.getPluginManager().getPlugin("PermissionsBukkit") != null) {
+            if (server.getPluginManager().getPlugin("PermissionsBukkit") != null) {
                 LOGGER.info("Bukkit Permissions " + permission + " " + player.hasPermission(permission));
             } else if (permissionsEr && (player.isOp() || player.hasPermission(permission))) {
                 LOGGER.info("Unknown permissions plugin " + permission + " " + player.hasPermission(permission));
@@ -175,14 +149,7 @@ public class AutoSort extends JavaPlugin {
 
     // permissions plugin debug information
     private void getPermissionsPlugin() {
-        if (server.getPluginManager().getPlugin("Vault") != null) {
-            RegisteredServiceProvider<Permission> rsp = getServer().getServicesManager().getRegistration(Permission.class);
-            if (!permissionsSet) {
-                LOGGER.info(pluginName + ": Vault detected, permissions enabled...");
-                permissionsSet = true;
-            }
-            vaultPerms = rsp.getProvider();
-        } else if (server.getPluginManager().getPlugin("PermissionsBukkit") != null) {
+        if (server.getPluginManager().getPlugin("PermissionsBukkit") != null) {
             if (!permissionsSet) {
                 LOGGER.info(pluginName + ": Bukkit permissions detected, permissions enabled...");
                 permissionsSet = true;
@@ -233,7 +200,7 @@ public class AutoSort extends JavaPlugin {
         Map<String, Object> groups = groupSec.getValues(false);
         for (String key : groups.keySet()) {
             List<String> idList = groupSec.getStringList(key);
-            List<ItemStack> matList = new ArrayList<ItemStack>();
+            List<ItemStack> matList = new ArrayList<>();
             for (String id : idList) {
                 ItemStack is = Util.parseMaterialID(id);
                 matList.add(is);
@@ -258,12 +225,16 @@ public class AutoSort extends JavaPlugin {
         for (String key : sortType.keySet()) {
             List<String> idList = ibSec.getStringList(key);
             Map<InventoryBlock, InventoryBlock> ivb;
-            if (key.toUpperCase().equals("DEPOSIT"))
-                ivb = depositBlocks;
-            else if (key.toUpperCase().equals("WITHDRAW")) {
-                ivb = withdrawBlocks;
-            } else {
-                ivb = sortBlocks;
+            switch (key.toUpperCase()) {
+                case "DEPOSIT":
+                    ivb = depositBlocks;
+                    break;
+                case "WITHDRAW":
+                    ivb = withdrawBlocks;
+                    break;
+                default:
+                    ivb = sortBlocks;
+                    break;
             }
             for (String id : idList) {
                 String[] split = id.split(":");
@@ -287,7 +258,7 @@ public class AutoSort extends JavaPlugin {
     }
 
     private Map<String, UUID> getDatabaseUUIDs() {
-        Map<String, UUID> namesToUUID = new HashMap<String, UUID>();
+        Map<String, UUID> namesToUUID = new HashMap<>();
         ConfigurationSection netsSec = getCustomConfig().getConfigurationSection("Owners");
         for (String owner : netsSec.getKeys(false)) {
             ConfigurationSection netSec = netsSec.getConfigurationSection(owner);
@@ -325,68 +296,99 @@ public class AutoSort extends JavaPlugin {
         int version = getCustomConfig().getInt("version", 5);
         if (version == 5) {
             LOGGER.info(pluginName + ": One moment, converting Version 5 database to Version 6 UUID database.");
-            final Map<String, UUID> namesToUUID = new HashMap<String, UUID>();
-            scheduler.runTaskAsynchronously(this, new Runnable() {
-
-                @Override
-                public void run() {
-                    LOGGER.info(pluginName + ": Precaching UUIDs for database conversion.");
-                    namesToUUID.putAll(getDatabaseUUIDs());
-                    uuidprecache = true;
-                }
+            final Map<String, UUID> namesToUUID = new HashMap<>();
+            scheduler.runTaskAsynchronously(this, () -> {
+                LOGGER.info(pluginName + ": Precaching UUIDs for database conversion.");
+                namesToUUID.putAll(getDatabaseUUIDs());
+                uuidprecache = true;
             });
-            scheduler.runTaskTimer(this, new Runnable() {
-
-                @Override
-                public void run() {
-                    if (uuidprecache) {
-                        ConfigurationSection netsSec = getCustomConfig().getConfigurationSection("Owners");
-                        for (String owner : netsSec.getKeys(false)) {
-                            ConfigurationSection netSec = netsSec.getConfigurationSection(owner);
-                            ConfigurationSection newnet = netSec.getConfigurationSection("NetworkNames");
-                            UUID ownerId = namesToUUID.get(owner);
-                            if (ownerId == null) {
-                                continue;
-                            }
-                            for (String netNameSec : newnet.getKeys(false)) {
-                                ConfigurationSection network = newnet.getConfigurationSection(netNameSec);
-                                SortNetwork net = new SortNetwork(ownerId, netNameSec, "");
-                                List<String> memberNames = network.getStringList("Members");
-                                List<UUID> memberUUIDs = new ArrayList<UUID>();
-                                for (String name : memberNames) {
-                                    UUID memberId = namesToUUID.get(name);
-                                    if (memberId == null) {
-                                        continue;
-                                    }
-                                    memberUUIDs.add(memberId);
+            scheduler.runTaskTimer(this, () -> {
+                if (uuidprecache) {
+                    ConfigurationSection netsSec = getCustomConfig().getConfigurationSection("Owners");
+                    for (String owner : netsSec.getKeys(false)) {
+                        ConfigurationSection netSec = netsSec.getConfigurationSection(owner);
+                        ConfigurationSection newnet = netSec.getConfigurationSection("NetworkNames");
+                        UUID ownerId = namesToUUID.get(owner);
+                        if (ownerId == null) {
+                            continue;
+                        }
+                        for (String netNameSec : newnet.getKeys(false)) {
+                            ConfigurationSection network = newnet.getConfigurationSection(netNameSec);
+                            SortNetwork net = new SortNetwork(ownerId, netNameSec, "");
+                            List<String> memberNames = network.getStringList("Members");
+                            List<UUID> memberUUIDs = new ArrayList<>();
+                            for (String name : memberNames) {
+                                UUID memberId = namesToUUID.get(name);
+                                if (memberId == null) {
+                                    continue;
                                 }
-                                net.members = memberUUIDs;
-                                ConfigurationSection chests = network.getConfigurationSection("Chests");
-                                for (String chestLocStr : chests.getKeys(false)) {
-                                    ConfigurationSection cSec = chests.getConfigurationSection(chestLocStr);
-                                    String[] chestData = chestLocStr.split(",");
-                                    World world = getServer().getWorld(chestData[0].replace("(dot)", "."));
+                                memberUUIDs.add(memberId);
+                            }
+                            net.members = memberUUIDs;
+                            ConfigurationSection chests = network.getConfigurationSection("Chests");
+                            for (String chestLocStr : chests.getKeys(false)) {
+                                ConfigurationSection cSec = chests.getConfigurationSection(chestLocStr);
+                                String[] chestData = chestLocStr.split(",");
+                                World world = getServer().getWorld(chestData[0].replace("(dot)", "."));
+                                if (world != null) {
+                                    if (!net.world.equals(world.getName())) {
+                                        net.world = world.getName();
+                                    }
+                                    Location chestLoc = new Location(world, Integer.parseInt(chestData[1]), Integer.parseInt(chestData[2]), Integer.parseInt(chestData[3]));
+                                    Block chest = chestLoc.getBlock();
+
+                                    String signLocStr = cSec.getString("Sign");
+                                    String[] signData = signLocStr.split(",");
+                                    Location signLoc = new Location(world, Integer.parseInt(signData[1]), Integer.parseInt(signData[2]), Integer.parseInt(signData[3]));
+
+                                    if (signLoc.getBlock().getState() instanceof Sign) {
+                                        Block sign = signLoc.getBlock();
+
+                                        String signText = cSec.getString("SignText");
+
+                                        int priority = cSec.getInt("Priority");
+
+                                        boolean disregardDamage = cSec.getBoolean("DisregardDamage");
+
+                                        net.sortChests.add(new SortChest(chest, sign, signText, priority, disregardDamage));
+                                        allNetworkBlocks.put(chest, net);
+                                        allNetworkBlocks.put(util.doubleChest(chest), net);
+                                        allNetworkBlocks.put(sign, net);
+                                    } else {
+                                        LOGGER.warning(pluginName + ": SortChest Sign Didnt exist at " + signLoc.getBlockX() + "," + signLoc.getBlockY() + "," + signLoc.getBlockZ() + ":" + signLoc.getWorld().getName());
+                                    }
+                                } else {
+                                    LOGGER.warning(pluginName + ": Null world: " + chestData[0] + " . Does this world still exist?");
+                                }
+                            }
+                            if (networks.containsKey(ownerId)) {
+                                networks.get(ownerId).add(net);
+                            } else {
+                                List<SortNetwork> nets = new ArrayList<>();
+                                nets.add(net);
+                                networks.put(ownerId, nets);
+                            }
+                            try {
+                                ConfigurationSection depChest = network.getConfigurationSection("DepositChests");
+                                for (String depChestLocStr : depChest.getKeys(false)) {
+                                    ConfigurationSection dSec = depChest.getConfigurationSection(depChestLocStr);
+                                    String[] depChestData = depChestLocStr.split(",");
+                                    World world = getServer().getWorld(depChestData[0].replace("(dot)", "."));
                                     if (world != null) {
                                         if (!net.world.equals(world.getName())) {
                                             net.world = world.getName();
                                         }
-                                        Location chestLoc = new Location(world, Integer.parseInt(chestData[1]), Integer.parseInt(chestData[2]), Integer.parseInt(chestData[3]));
-                                        Block chest = chestLoc.getBlock();
+                                        Location depChestLoc = new Location(world, Integer.parseInt(depChestData[1]), Integer.parseInt(depChestData[2]), Integer.parseInt(depChestData[3]));
+                                        Block chest = depChestLoc.getBlock();
 
-                                        String signLocStr = cSec.getString("Sign");
+                                        String signLocStr = dSec.getString("Sign");
                                         String[] signData = signLocStr.split(",");
                                         Location signLoc = new Location(world, Integer.parseInt(signData[1]), Integer.parseInt(signData[2]), Integer.parseInt(signData[3]));
 
                                         if (signLoc.getBlock().getState() instanceof Sign) {
                                             Block sign = signLoc.getBlock();
-
-                                            String signText = cSec.getString("SignText");
-
-                                            int priority = cSec.getInt("Priority");
-
-                                            boolean disregardDamage = cSec.getBoolean("DisregardDamage");
-
-                                            net.sortChests.add(new SortChest(chest, sign, signText, priority, disregardDamage));
+                                            NetworkItem netItem = new NetworkItem(net, chest, sign);
+                                            net.depositChests.put(chest, netItem);
                                             allNetworkBlocks.put(chest, net);
                                             allNetworkBlocks.put(util.doubleChest(chest), net);
                                             allNetworkBlocks.put(sign, net);
@@ -394,122 +396,82 @@ public class AutoSort extends JavaPlugin {
                                             LOGGER.warning(pluginName + ": SortChest Sign Didnt exist at " + signLoc.getBlockX() + "," + signLoc.getBlockY() + "," + signLoc.getBlockZ() + ":" + signLoc.getWorld().getName());
                                         }
                                     } else {
-                                        LOGGER.warning(pluginName + ": Null world: " + chestData[0] + " . Does this world still exist?");
+                                        LOGGER.warning(pluginName + ": Null world: " + depChestData[0] + " . Does this world still exist?");
                                     }
                                 }
-                                if (networks.containsKey(ownerId)) {
-                                    networks.get(ownerId).add(net);
-                                } else {
-                                    List<SortNetwork> nets = new ArrayList<SortNetwork>();
-                                    nets.add(net);
-                                    networks.put(ownerId, nets);
-                                }
-                                try {
-                                    ConfigurationSection depChest = network.getConfigurationSection("DepositChests");
-                                    for (String depChestLocStr : depChest.getKeys(false)) {
-                                        ConfigurationSection dSec = depChest.getConfigurationSection(depChestLocStr);
-                                        String[] depChestData = depChestLocStr.split(",");
-                                        World world = getServer().getWorld(depChestData[0].replace("(dot)", "."));
-                                        if (world != null) {
-                                            if (!net.world.equals(world.getName())) {
-                                                net.world = world.getName();
-                                            }
-                                            Location depChestLoc = new Location(world, Integer.parseInt(depChestData[1]), Integer.parseInt(depChestData[2]), Integer.parseInt(depChestData[3]));
-                                            Block chest = depChestLoc.getBlock();
+                            } catch (Exception e) {
+                                LOGGER.warning(pluginName + ": did not find dropchest section in database");
+                                LOGGER.warning(pluginName + ": it will be added next save update");
+                            }
 
-                                            String signLocStr = dSec.getString("Sign");
-                                            String[] signData = signLocStr.split(",");
-                                            Location signLoc = new Location(world, Integer.parseInt(signData[1]), Integer.parseInt(signData[2]), Integer.parseInt(signData[3]));
-
-                                            if (signLoc.getBlock().getState() instanceof Sign) {
-                                                Block sign = signLoc.getBlock();
-                                                NetworkItem netItem = new NetworkItem(net, chest, sign);
-                                                net.depositChests.put(chest, netItem);
-                                                allNetworkBlocks.put(chest, net);
-                                                allNetworkBlocks.put(util.doubleChest(chest), net);
-                                                allNetworkBlocks.put(sign, net);
-                                            } else {
-                                                LOGGER.warning(pluginName + ": SortChest Sign Didnt exist at " + signLoc.getBlockX() + "," + signLoc.getBlockY() + "," + signLoc.getBlockZ() + ":" + signLoc.getWorld().getName());
-                                            }
-                                        } else {
-                                            LOGGER.warning(pluginName + ": Null world: " + depChestData[0] + " . Does this world still exist?");
+                            try {
+                                ConfigurationSection wdChest = network.getConfigurationSection("WithdrawChests");
+                                for (String wdChestLocStr : wdChest.getKeys(false)) {
+                                    ConfigurationSection dSec = wdChest.getConfigurationSection(wdChestLocStr);
+                                    String[] wdChestData = wdChestLocStr.split(",");
+                                    World world = getServer().getWorld(wdChestData[0].replace("(dot)", "."));
+                                    if (world != null) {
+                                        if (!net.world.equals(world.getName())) {
+                                            net.world = world.getName();
                                         }
-                                    }
-                                } catch (Exception e) {
-                                    LOGGER.warning(pluginName + ": did not find dropchest section in database");
-                                    LOGGER.warning(pluginName + ": it will be added next save update");
-                                }
+                                        Location depChestLoc = new Location(world, Integer.parseInt(wdChestData[1]), Integer.parseInt(wdChestData[2]), Integer.parseInt(wdChestData[3]));
+                                        Block chest = depChestLoc.getBlock();
 
-                                try {
-                                    ConfigurationSection wdChest = network.getConfigurationSection("WithdrawChests");
-                                    for (String wdChestLocStr : wdChest.getKeys(false)) {
-                                        ConfigurationSection dSec = wdChest.getConfigurationSection(wdChestLocStr);
-                                        String[] wdChestData = wdChestLocStr.split(",");
-                                        World world = getServer().getWorld(wdChestData[0].replace("(dot)", "."));
-                                        if (world != null) {
-                                            if (!net.world.equals(world.getName())) {
-                                                net.world = world.getName();
-                                            }
-                                            Location depChestLoc = new Location(world, Integer.parseInt(wdChestData[1]), Integer.parseInt(wdChestData[2]), Integer.parseInt(wdChestData[3]));
-                                            Block chest = depChestLoc.getBlock();
-
-                                            String signLocStr = dSec.getString("Sign");
-                                            String[] signData = signLocStr.split(",");
-                                            Location signLoc = new Location(world, Integer.parseInt(signData[1]), Integer.parseInt(signData[2]), Integer.parseInt(signData[3]));
-                                            if (signLoc.getBlock().getState() instanceof Sign) {
-                                                Block sign = signLoc.getBlock();
-                                                NetworkItem netItem = new NetworkItem(net, chest, sign);
-                                                net.withdrawChests.put(chest, netItem);
-                                                allNetworkBlocks.put(chest, net);
-                                                allNetworkBlocks.put(util.doubleChest(chest), net);
-                                                allNetworkBlocks.put(sign, net);
-                                            } else {
-                                                LOGGER.warning(pluginName + ": SortChest Sign Didnt exist at " + signLoc.getBlockX() + "," + signLoc.getBlockY() + "," + signLoc.getBlockZ() + ":" + signLoc.getWorld().getName());
-                                            }
+                                        String signLocStr = dSec.getString("Sign");
+                                        String[] signData = signLocStr.split(",");
+                                        Location signLoc = new Location(world, Integer.parseInt(signData[1]), Integer.parseInt(signData[2]), Integer.parseInt(signData[3]));
+                                        if (signLoc.getBlock().getState() instanceof Sign) {
+                                            Block sign = signLoc.getBlock();
+                                            NetworkItem netItem = new NetworkItem(net, chest, sign);
+                                            net.withdrawChests.put(chest, netItem);
+                                            allNetworkBlocks.put(chest, net);
+                                            allNetworkBlocks.put(util.doubleChest(chest), net);
+                                            allNetworkBlocks.put(sign, net);
                                         } else {
-                                            LOGGER.warning(pluginName + ": Null world: " + wdChestData[0] + " . Does this world still exist?");
+                                            LOGGER.warning(pluginName + ": SortChest Sign Didnt exist at " + signLoc.getBlockX() + "," + signLoc.getBlockY() + "," + signLoc.getBlockZ() + ":" + signLoc.getWorld().getName());
                                         }
+                                    } else {
+                                        LOGGER.warning(pluginName + ": Null world: " + wdChestData[0] + " . Does this world still exist?");
                                     }
-                                } catch (Exception e) {
-                                    LOGGER.warning(pluginName + ": did not find withdraw chest section in database");
-                                    LOGGER.warning(pluginName + ": it will be added next save update");
                                 }
+                            } catch (Exception e) {
+                                LOGGER.warning(pluginName + ": did not find withdraw chest section in database");
+                                LOGGER.warning(pluginName + ": it will be added next save update");
+                            }
 
-                                try {
-                                    ConfigurationSection dSign = network.getConfigurationSection("DropSigns");
-                                    for (String dSignLocStr : dSign.getKeys(false)) {
-                                        String[] dSignData = dSignLocStr.split(",");
-                                        World world = getServer().getWorld(dSignData[0].replace("(dot)", "."));
-                                        if (world != null) {
-                                            if (!net.world.equals(world.getName())) {
-                                                net.world = world.getName();
-                                            }
-                                            Location dSignLoc = new Location(world, Integer.parseInt(dSignData[1]), Integer.parseInt(dSignData[2]), Integer.parseInt(dSignData[3]));
-                                            Block sign = dSignLoc.getBlock();
-                                            if (sign.getState() instanceof Sign) {
-                                                NetworkItem netItem = new NetworkItem(net, null, sign);
-                                                net.dropSigns.put(sign, netItem);
-                                                allNetworkBlocks.put(sign, net);
-                                            } else {
-                                                LOGGER.warning(pluginName + ": Drop Sign Didnt exist at " + dSignLoc.getBlockX() + "," + dSignLoc.getBlockY() + "," + dSignLoc.getBlockZ() + ":" + dSignLoc.getWorld().getName());
-                                            }
-                                        } else {
-                                            LOGGER.warning(pluginName + ": Null world: " + dSignData[0] + " . Does this world still exist?");
+                            try {
+                                ConfigurationSection dSign = network.getConfigurationSection("DropSigns");
+                                for (String dSignLocStr : dSign.getKeys(false)) {
+                                    String[] dSignData = dSignLocStr.split(",");
+                                    World world = getServer().getWorld(dSignData[0].replace("(dot)", "."));
+                                    if (world != null) {
+                                        if (!net.world.equals(world.getName())) {
+                                            net.world = world.getName();
                                         }
+                                        Location dSignLoc = new Location(world, Integer.parseInt(dSignData[1]), Integer.parseInt(dSignData[2]), Integer.parseInt(dSignData[3]));
+                                        Block sign = dSignLoc.getBlock();
+                                        if (sign.getState() instanceof Sign) {
+                                            NetworkItem netItem = new NetworkItem(net, null, sign);
+                                            net.dropSigns.put(sign, netItem);
+                                            allNetworkBlocks.put(sign, net);
+                                        } else {
+                                            LOGGER.warning(pluginName + ": Drop Sign Didnt exist at " + dSignLoc.getBlockX() + "," + dSignLoc.getBlockY() + "," + dSignLoc.getBlockZ() + ":" + dSignLoc.getWorld().getName());
+                                        }
+                                    } else {
+                                        LOGGER.warning(pluginName + ": Null world: " + dSignData[0] + " . Does this world still exist?");
                                     }
-                                } catch (Exception e) {
-                                    LOGGER.warning(pluginName + ": did not find dropsigns section in database");
-                                    LOGGER.warning(pluginName + ": it will be added next save update");
                                 }
+                            } catch (Exception e) {
+                                LOGGER.warning(pluginName + ": did not find dropsigns section in database");
+                                LOGGER.warning(pluginName + ": it will be added next save update");
                             }
                         }
-                        saveVersion6Network();
-                        UUIDLoaded = true;
-                        LOGGER.info(pluginName + ": Finished UUID conversion. Database updated to Version 6.");
-                        uuidprecache = false;
                     }
+                    saveVersion6Network();
+                    UUIDLoaded = true;
+                    LOGGER.info(pluginName + ": Finished UUID conversion. Database updated to Version 6.");
+                    uuidprecache = false;
                 }
-
             }, 20, 20);
         } else if (version == 6) {
             ConfigurationSection netsSec = getCustomConfig().getConfigurationSection("Owners");
@@ -521,7 +483,7 @@ public class AutoSort extends JavaPlugin {
                     ConfigurationSection network = newnet.getConfigurationSection(netNameSec);
                     SortNetwork net = new SortNetwork(ownerId, netNameSec, "");
                     List<String> memberUUIDStrings = network.getStringList("Members");
-                    List<UUID> memberUUIDs = new ArrayList<UUID>();
+                    List<UUID> memberUUIDs = new ArrayList<>();
                     for (String uuidString : memberUUIDStrings) {
                         UUID memberId = UUID.fromString(uuidString);
                         memberUUIDs.add(memberId);
@@ -566,7 +528,7 @@ public class AutoSort extends JavaPlugin {
                     if (networks.containsKey(ownerId)) {
                         networks.get(ownerId).add(net);
                     } else {
-                        List<SortNetwork> nets = new ArrayList<SortNetwork>();
+                        List<SortNetwork> nets = new ArrayList<>();
                         nets.add(net);
                         networks.put(ownerId, nets);
                     }
@@ -674,16 +636,16 @@ public class AutoSort extends JavaPlugin {
     }
 
     public boolean cleanupNetwork() {
-        List<Block> removeNetMapBlock = new ArrayList<Block>();
-        List<SortNetwork> removedNets = new ArrayList<SortNetwork>();
-        List<UUID> players = new ArrayList<UUID>();
+        List<Block> removeNetMapBlock = new ArrayList<>();
+        List<SortNetwork> removedNets = new ArrayList<>();
+        List<UUID> players = new ArrayList<>();
         boolean somethingCleaned = false;
         for (Entry<Block, SortNetwork> networkObject : allNetworkBlocks.entrySet()) {
             SortNetwork network = networkObject.getValue();
-            List<Block> removeDepositChests = new ArrayList<Block>();
-            List<Block> removeDropSigns = new ArrayList<Block>();
-            List<Block> removeWithdrawChests = new ArrayList<Block>();
-            List<SortChest> removedChests = new ArrayList<SortChest>();
+            List<Block> removeDepositChests = new ArrayList<>();
+            List<Block> removeDropSigns = new ArrayList<>();
+            List<Block> removeWithdrawChests = new ArrayList<>();
+            List<SortChest> removedChests = new ArrayList<>();
 
             for (NetworkItem netItem : network.depositChests.values()) {
                 boolean chestChunkLoaded = false;
@@ -833,7 +795,7 @@ public class AutoSort extends JavaPlugin {
 
                 // Save Members
                 ConfigurationSection netnames = newnet.createSection(net.netName);
-                List<String> UUIDStrings = new ArrayList<String>();
+                List<String> UUIDStrings = new ArrayList<>();
                 for (UUID id : net.members) {
                     UUIDStrings.add(id.toString());
                 }

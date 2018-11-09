@@ -18,13 +18,12 @@ import plugin.arcwolf.autosort.network.SortNetwork;
 import java.util.List;
 import java.util.Map.Entry;
 
+@SuppressWarnings("ConstantConditions")
 public class SortTask implements Runnable {
 
     boolean waitTime = false;
     private AutoSort plugin;
-    private long timer = 0;
-    private long previousTime = 0;
-    private long tick = 0;
+private long tick = 0;
 
     public SortTask(AutoSort autoSort) {
         plugin = autoSort;
@@ -32,7 +31,8 @@ public class SortTask implements Runnable {
 
     public void run() {
         if (!plugin.UUIDLoaded) return;
-        timer = System.currentTimeMillis();
+        long timer = System.currentTimeMillis();
+        long previousTime = 0;
         if (waitTime && timer - previousTime > 5000) {
             waitTime = false;
         }
@@ -77,8 +77,7 @@ public class SortTask implements Runnable {
                             if (net != null && plugin.util.isValidDepositBlock(depChest.getKey())) {
                                 Inventory chest = Util.getInventory(depChest.getKey());
                                 if (chest == null) continue;
-                                Inventory inv = chest;
-                                ItemStack[] contents = inv.getContents();
+                                ItemStack[] contents = chest.getContents();
                                 int i;
                                 ItemStack is;
                                 for (i = 0; i < contents.length; i++) {
@@ -89,7 +88,7 @@ public class SortTask implements Runnable {
                                         }
                                     }
                                 }
-                                inv.setContents(contents);
+                                chest.setContents(contents);
                             }
                         }
                     }
