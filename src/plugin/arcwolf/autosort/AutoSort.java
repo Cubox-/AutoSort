@@ -755,7 +755,7 @@ private String pluginName;
 
         for (Entry<UUID, List<SortNetwork>> nets : networks.entrySet())
             for (SortNetwork network : nets.getValue())
-                if (network.sortChests.size() == 0 && network.depositChests.size() == 0 && network.depositChests.size() == 0 && network.dropSigns.size() == 0) {
+                if (network.sortChests.size() == 0 && network.depositChests.size() == 0 && network.withdrawChests.size() == 0 && network.dropSigns.size() == 0) {
                     removedNets.add(network);
                     somethingCleaned = true;
                     LOGGER.info(pluginName + ": Network " + network.netName + " removed (Empty Network).");
