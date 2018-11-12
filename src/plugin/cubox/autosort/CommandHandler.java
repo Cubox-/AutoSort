@@ -27,7 +27,6 @@ public class CommandHandler {
 
     private AutoSort plugin;
     private BukkitScheduler scheduler;
-    public static final Logger LOGGER = Logger.getLogger("Minecraft.AutoSort");
 
     public CommandHandler(AutoSort plugin) {
         this.plugin = plugin;
@@ -741,7 +740,7 @@ public class CommandHandler {
 
     private String getTrueMaterial(ItemStack item) {
         if (item == null) {
-            LOGGER.warning("We were passed a null ItemStack");
+            AutoSort.LOGGER.warning("We were passed a null ItemStack");
             return "null";
         }
         return item.getType().name();
