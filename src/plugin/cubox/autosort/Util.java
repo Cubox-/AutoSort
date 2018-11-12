@@ -1,4 +1,4 @@
-package plugin.arcwolf.autosort;
+package plugin.cubox.autosort;
 
 import org.bukkit.*;
 import org.bukkit.block.Block;
@@ -9,8 +9,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.plugin.Plugin;
-import plugin.arcwolf.autosort.network.SortChest;
+import plugin.cubox.autosort.network.SortChest;
 
 import java.text.NumberFormat;
 import java.text.ParsePosition;

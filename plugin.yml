@@ -1,10 +1,10 @@
 name: AutoSort
-authors: [ArcWolf, TheJuggernaut0]
-main: plugin.arcwolf.autosort.AutoSort
-version: 0.9c1
+authors: [ArcWolf, TheJuggernaut0, Senither, Cubox]
+main: plugin.cubox.autosort.AutoSort
+version: 0.2
 api-version: 1.13
 website: http://dev.bukkit.org/bukkit-plugins/autosort/
-description: A chest inventory sorting plugin. Originally created by TheJuggernaut0. Updated / maintained by ArcWolf.
+description: A chest inventory sorting plugin.
 commands:
   autosort:
     description: Sort your entire inventory except your inventory bar

@@ -1,4 +1,4 @@
-package plugin.arcwolf.autosort;
+package plugin.cubox.autosort;
 
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
@@ -24,9 +24,9 @@ import org.bukkit.event.player.PlayerLoginEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
-import plugin.arcwolf.autosort.network.NetworkItem;
-import plugin.arcwolf.autosort.network.SortChest;
-import plugin.arcwolf.autosort.network.SortNetwork;
+import plugin.cubox.autosort.network.NetworkItem;
+import plugin.cubox.autosort.network.SortChest;
+import plugin.cubox.autosort.network.SortNetwork;
 
 import java.util.ArrayList;
 import java.util.List;

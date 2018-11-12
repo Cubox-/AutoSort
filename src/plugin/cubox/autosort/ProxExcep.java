@@ -1,4 +1,4 @@
-package plugin.arcwolf.autosort;
+package plugin.cubox.autosort;
 
 import java.util.UUID;
 

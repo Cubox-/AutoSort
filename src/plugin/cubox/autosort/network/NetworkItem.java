@@ -1,4 +1,4 @@
-package plugin.arcwolf.autosort.network;
+package plugin.cubox.autosort.network;
 
 import org.bukkit.block.Block;
 

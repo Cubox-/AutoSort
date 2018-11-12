@@ -1,4 +1,4 @@
-package plugin.arcwolf.autosort.task;
+package plugin.cubox.autosort.task;
 
 import org.bukkit.Material;
 import org.bukkit.World;
@@ -9,11 +9,11 @@ import org.bukkit.entity.Item;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.Vector;
-import plugin.arcwolf.autosort.AutoSort;
-import plugin.arcwolf.autosort.Util;
-import plugin.arcwolf.autosort.network.NetworkItem;
-import plugin.arcwolf.autosort.network.SortChest;
-import plugin.arcwolf.autosort.network.SortNetwork;
+import plugin.cubox.autosort.AutoSort;
+import plugin.cubox.autosort.Util;
+import plugin.cubox.autosort.network.NetworkItem;
+import plugin.cubox.autosort.network.SortChest;
+import plugin.cubox.autosort.network.SortNetwork;
 
 import java.util.List;
 import java.util.Map.Entry;

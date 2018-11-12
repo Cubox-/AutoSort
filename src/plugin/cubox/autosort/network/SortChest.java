@@ -1,10 +1,10 @@
-package plugin.arcwolf.autosort.network;
+package plugin.cubox.autosort.network;
 
 import org.bukkit.block.Block;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
-import plugin.arcwolf.autosort.AutoSort;
-import plugin.arcwolf.autosort.Util;
+import plugin.cubox.autosort.AutoSort;
+import plugin.cubox.autosort.Util;
 
 import java.util.ArrayList;
 import java.util.Collection;
