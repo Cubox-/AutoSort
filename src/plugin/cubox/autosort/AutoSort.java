@@ -1,4 +1,4 @@
-package plugin.arcwolf.autosort;
+package plugin.cubox.autosort;
 
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -16,14 +16,13 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.PluginDescriptionFile;
 import org.bukkit.plugin.PluginManager;
-import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitScheduler;
-import plugin.arcwolf.autosort.network.NetworkItem;
-import plugin.arcwolf.autosort.network.SortChest;
-import plugin.arcwolf.autosort.network.SortNetwork;
-import plugin.arcwolf.autosort.task.CleanupTask;
-import plugin.arcwolf.autosort.task.SortTask;
+import plugin.cubox.autosort.network.NetworkItem;
+import plugin.cubox.autosort.network.SortChest;
+import plugin.cubox.autosort.network.SortNetwork;
+import plugin.cubox.autosort.task.CleanupTask;
+import plugin.cubox.autosort.task.SortTask;
 
 import java.io.File;
 import java.io.IOException;
@@ -63,9 +62,9 @@ public class AutoSort extends JavaPlugin {
     public List<Item> stillItems = new ArrayList<>();
     public ConcurrentHashMap<Block, SortNetwork> allNetworkBlocks = new ConcurrentHashMap<>();
     public ConcurrentHashMap<UUID, List<SortNetwork>> networks = new ConcurrentHashMap<>();
-    public Map<InventoryBlock, InventoryBlock> sortBlocks = new HashMap<>();
-    public Map<InventoryBlock, InventoryBlock> depositBlocks = new HashMap<>();
-    public Map<InventoryBlock, InventoryBlock> withdrawBlocks = new HashMap<>();
+    public Map<Material, Material> sortBlocks = new HashMap<>();
+    public Map<Material, Material> depositBlocks = new HashMap<>();
+    public Map<Material, Material> withdrawBlocks = new HashMap<>();
     public boolean UUIDLoaded = false;
     public boolean worldRestrict = false;
     public AutoSortListener asListener;
@@ -203,6 +202,9 @@ private String pluginName;
             List<ItemStack> matList = new ArrayList<>();
             for (String id : idList) {
                 ItemStack is = Util.parseMaterialID(id);
+                if (is == null) {
+                    continue;
+                }
                 matList.add(is);
             }
             customMatGroups.put(key.toUpperCase(), matList);
@@ -224,7 +226,7 @@ private String pluginName;
         Map<String, Object> sortType = ibSec.getValues(false);
         for (String key : sortType.keySet()) {
             List<String> idList = ibSec.getStringList(key);
-            Map<InventoryBlock, InventoryBlock> ivb;
+            Map<Material, Material> ivb;
             switch (key.toUpperCase()) {
                 case "DEPOSIT":
                     ivb = depositBlocks;
@@ -237,21 +239,11 @@ private String pluginName;
                     break;
             }
             for (String id : idList) {
-                String[] split = id.split(":");
-                if (split.length > 1) {
-                    try {
-                        InventoryBlock ib = new InventoryBlock(Integer.parseInt(split[0]), Integer.parseInt(split[1]));
-                        ivb.put(ib, ib);
-                    } catch (Exception e) {
-                        AutoSort.LOGGER.warning("Error Parsing Inventory Block in " + key + " group. ID found was: " + split[0] + " " + split[1]);
-                    }
-                } else {
-                    try {
-                        InventoryBlock ib = new InventoryBlock(Integer.parseInt(id));
-                        ivb.put(ib, ib);
-                    } catch (Exception e) {
-                        AutoSort.LOGGER.warning("Error Parsing Inventory Block in " + key + " group. ID found was: " + id);
-                    }
+                try {
+                    Material ib = Material.matchMaterial(id);
+                    ivb.put(ib, ib);
+                } catch (Exception e) {
+                    AutoSort.LOGGER.warning("Error Parsing Inventory Block in " + key + " group. ID found was: " + id);
                 }
             }
         }
@@ -678,7 +670,7 @@ private String pluginName;
                 Block sign = netItem.sign.getLocation().getBlock();
                 boolean signChunkLoaded = false;
                 if (!sign.getChunk().isLoaded()) signChunkLoaded = sign.getChunk().load();
-                if (!sign.getType().equals(Material.SIGN_POST)) {
+                if (!sign.getType().equals(Material.WALL_SIGN)) {
                     removeDropSigns.add(sign);
                     removeNetMapBlock.add(sign);
                     somethingCleaned = true;

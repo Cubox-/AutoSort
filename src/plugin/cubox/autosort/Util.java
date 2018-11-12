@@ -16,6 +16,7 @@ import java.text.NumberFormat;
 import java.text.ParsePosition;
 import java.util.Map;
 import java.util.UUID;
+import java.util.logging.Logger;
 
 public class Util {
 
@@ -54,6 +55,9 @@ public class Util {
                 Material mat = Material.matchMaterial(str);
                 if (mat != null) {
                     return new ItemStack(mat, 1);
+                } else {
+                    AutoSort.LOGGER.warning("We tried to give Material.matchMaterial " + str + " but it returned null.");
+                    return null;
                 }
             }
         }
@@ -93,11 +97,8 @@ public class Util {
     }
 
     public boolean isValidInventoryBlock(Player player, Block block, Boolean isEventCheck) {
-        int blockId = block.getTypeId();
-        int blockData = block.getData();
-        if (plugin.sortBlocks.containsKey(new InventoryBlock(blockId, blockData))) {
-            return true;
-        } else if (plugin.sortBlocks.containsKey(new InventoryBlock(blockId))) {
+        Material blockType = block.getType();
+        if (plugin.sortBlocks.containsKey(blockType)) {
             return true;
         } else {
             if (isEventCheck) player.sendMessage(ChatColor.RED + "That's not a recognized inventory block!");
@@ -110,11 +111,8 @@ public class Util {
     }
 
     public boolean isValidDepositBlock(Player player, Block block, Boolean isEventCheck) {
-        int blockId = block.getTypeId();
-        int blockData = block.getData();
-        if (plugin.depositBlocks.containsKey(new InventoryBlock(blockId, blockData))) {
-            return true;
-        } else if (plugin.depositBlocks.containsKey(new InventoryBlock(blockId))) {
+        Material blockType = block.getType();
+        if (plugin.depositBlocks.containsKey(blockType)) {
             return true;
         } else {
             if (isEventCheck) player.sendMessage(ChatColor.RED + "That's not a recognized inventory block!");
@@ -127,11 +125,8 @@ public class Util {
     }
 
     public boolean isValidWithdrawBlock(Player player, Block block, Boolean isEventCheck) {
-        int blockId = block.getTypeId();
-        int blockData = block.getData();
-        if (plugin.withdrawBlocks.containsKey(new InventoryBlock(blockId, blockData))) {
-            return true;
-        } else if (plugin.withdrawBlocks.containsKey(new InventoryBlock(blockId))) {
+        Material blockType = block.getType();
+        if (plugin.withdrawBlocks.containsKey(blockType)) {
             return true;
         } else {
             if (isEventCheck) player.sendMessage(ChatColor.RED + "That's not a recognized inventory block!");
@@ -144,7 +139,7 @@ public class Util {
         BlockFace[] surchest = {BlockFace.SELF, BlockFace.NORTH, BlockFace.EAST, BlockFace.SOUTH, BlockFace.WEST};
         for (BlockFace face : surchest) {
             Block sign = block.getRelative(face);
-            if (sign.getType().equals(Material.WALL_SIGN) || sign.getType().equals(Material.SIGN_POST)) {
+            if (sign.getType().equals(Material.WALL_SIGN)) {
                 return sign;
             }
         }

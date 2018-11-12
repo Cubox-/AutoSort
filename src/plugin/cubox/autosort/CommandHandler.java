@@ -20,12 +20,14 @@ import plugin.arcwolf.autosort.network.SortNetwork;
 
 import java.util.*;
 import java.util.Map.Entry;
+import java.util.logging.Logger;
 
 @SuppressWarnings({"ConstantConditions", "BooleanMethodIsAlwaysInverted", "UnusedReturnValue", "SameReturnValue"})
 public class CommandHandler {
 
     private AutoSort plugin;
     private BukkitScheduler scheduler;
+    public static final Logger LOGGER = Logger.getLogger("Minecraft.AutoSort");
 
     public CommandHandler(AutoSort plugin) {
         this.plugin = plugin;
@@ -133,7 +135,7 @@ public class CommandHandler {
                 sender.sendMessage(ChatColor.RED + "Incorrect command arguments");
                 sender.sendMessage("Try " + ChatColor.YELLOW + " /addasgroup <groupName> <itemID>");
             }
-        } else if (commandName.equalsIgnoreCase("modasgroup")) {
+        /*} else if (commandName.equalsIgnoreCase("modasgroup")) {
             if (!plugin.hasPermission(player, "autosort.modasgroup")) {
                 sender.sendMessage(ChatColor.RED + "Sorry you do not have permission for " + ChatColor.YELLOW + commandName + ChatColor.RED + " command.");
                 return;
@@ -180,7 +182,7 @@ public class CommandHandler {
             } else {
                 sender.sendMessage(ChatColor.RED + "Incorrect command arguments");
                 sender.sendMessage("Try " + ChatColor.YELLOW + " /modasgroup <groupName>");
-            }
+            }*/
         } else if (commandName.equalsIgnoreCase("delasgroup")) {
             if (!plugin.hasPermission(player, "autosort.delasgroup")) {
                 sender.sendMessage(ChatColor.RED + "Sorry you do not have permission for " + ChatColor.YELLOW + commandName + ChatColor.RED + " command.");
@@ -501,7 +503,6 @@ public class CommandHandler {
                 UUID ownerId = getPlayerUUID(args[0], sender);
                 if (ownerId == null) return;
                 SortNetwork net = plugin.findNetwork(ownerId, netName);
-                net = plugin.findNetwork(ownerId, netName);
                 if (net != null) {
                     int count = 0;
                     for (int i = 2; i < args.length; i++) {
@@ -571,7 +572,7 @@ public class CommandHandler {
                 AutoSort.customMatGroups.put(groupName, matList);
                 sender.sendMessage(ChatColor.GREEN + "AutoSort group added.");
             }
-        } else if (commandName.equalsIgnoreCase("modasgroup")) {
+        /*} else if (commandName.equalsIgnoreCase("modasgroup")) {
             if (args.length > 1) {
                 String groupName = args[0].toUpperCase();
                 if (AutoSort.customMatGroups.containsKey(groupName)) {
@@ -599,7 +600,7 @@ public class CommandHandler {
                 } else {
                     sender.sendMessage(ChatColor.RED + "That group does not exist!");
                 }
-            }
+            }*/
         } else if (commandName.equalsIgnoreCase("delasgroup")) {
             if (args.length == 1) {
                 String groupName = args[0].toUpperCase();
@@ -725,12 +726,12 @@ public class CommandHandler {
 
     private void updateSign(final Block sign, final String netName, final String whoDeleted) {
         scheduler.runTask(plugin, () -> {
-            if (sign.getType().equals(Material.WALL_SIGN) || sign.getType().equals(Material.SIGN_POST)) {
+            if (sign.getType().equals(Material.WALL_SIGN)) {
                 BlockState sgn = sign.getState();
                 Sign s = (Sign) sign.getState();
-                s.setLine(0, "�e[ " + netName + " ]");
-                s.setLine(1, "�edeleted by");
-                s.setLine(2, "�e" + whoDeleted);
+                s.setLine(0, "[ " + netName + " ]");
+                s.setLine(1, "deleted by");
+                s.setLine(2, "" + whoDeleted);
                 s.setLine(3, "");
                 sgn.update(true);
                 s.update(true);
@@ -739,6 +740,10 @@ public class CommandHandler {
     }
 
     private String getTrueMaterial(ItemStack item) {
+        if (item == null) {
+            LOGGER.warning("We were passed a null ItemStack");
+            return "null";
+        }
         return item.getType().name();
     }
 

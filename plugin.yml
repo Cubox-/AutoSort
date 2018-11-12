@@ -2,7 +2,7 @@ name: AutoSort
 authors: [ArcWolf, TheJuggernaut0]
 main: plugin.arcwolf.autosort.AutoSort
 version: 0.9c1
-softdepend: [BKCommonLib]
+api-version: 1.13
 website: http://dev.bukkit.org/bukkit-plugins/autosort/
 description: A chest inventory sorting plugin. Originally created by TheJuggernaut0. Updated / maintained by ArcWolf.
 commands:

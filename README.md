@@ -1,7 +1,7 @@
 Auto Sort
 =========
 
-This repository has been forked from [bitbucket.com/arcwolf/autosort](https://bitbucket.org/arcwolf/autosort), this fork is an updated version of the plugin with support for Bukkit/Spigot versions **1.12+**, the plugin was originally made for **1.8**.
+This repository has been forked from [bitbucket.com/arcwolf/autosort](https://bitbucket.org/arcwolf/autosort), this fork is an updated version of the plugin with support for Bukkit/Spigot versions **1.13+**, the plugin was originally made for **1.8**.
 
 > **Disclaimer**: This repository will most likely not be fully maintained for future versions of Bukkit/Spigot, some features from the original plugin may also be removed.
 

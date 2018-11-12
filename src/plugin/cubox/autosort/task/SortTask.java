@@ -51,7 +51,7 @@ private long tick = 0;
                         } else if (hopper.getRelative(face).getType().equals(Material.HOPPER)) {
                             break;
                         }
-                        if (dropSpot.getRelative(face).getType().equals(Material.SIGN_POST)) {
+                        if (dropSpot.getRelative(face).getType().equals(Material.WALL_SIGN)) {
                             Sign sign = (Sign) dropSpot.getRelative(face).getState();
                             sortDropSign(item, sign);
                             break;

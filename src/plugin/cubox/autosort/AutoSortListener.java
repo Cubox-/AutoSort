@@ -61,7 +61,7 @@ public class AutoSortListener implements Listener {
             Block sign;
             for (BlockFace face : surrounding) {
                 sign = block.getRelative(BlockFace.UP).getRelative(face);
-                if (sign.getType().equals(Material.SIGN_POST) && plugin.allNetworkBlocks.containsKey(sign)) {
+                if (sign.getType().equals(Material.WALL_SIGN) && plugin.allNetworkBlocks.containsKey(sign)) {
                     event.setCancelled(true);
                     return;
                 }
@@ -452,7 +452,7 @@ public class AutoSortListener implements Listener {
                     event.getPlayer().sendMessage(ChatColor.RED + "You do not have permission to create AutoSort chests.");
                 }
             }
-        } else if (event.getBlock().getType().equals(Material.SIGN_POST)) { // TODO Drop Sign
+        } else if (event.getBlock().getType().equals(Material.WALL_SIGN)) { // TODO Drop Sign
             if (plugin.hasPermission(player, "autosort.use.drop")) {
                 if (lines[0].startsWith("*")) {
                     Block sign = event.getBlock();
@@ -507,7 +507,7 @@ public class AutoSortListener implements Listener {
     public void onBlockPhysics(BlockPhysicsEvent event) {
         if (event.isCancelled()) return;
         Block block = event.getBlock();
-        if (block.getType().equals(Material.WALL_SIGN) || block.getType().equals(Material.SIGN_POST)) {
+        if (block.getType().equals(Material.WALL_SIGN) || block.getType().equals(Material.WALL_SIGN)) {
             String[] lines = ((Sign) block.getState()).getLines();
             if (lines[0].startsWith("*") || lines[0].startsWith("#")) {
                 if (plugin.allNetworkBlocks.containsKey(block)) {
@@ -526,7 +526,7 @@ public class AutoSortListener implements Listener {
         Player player = event.getPlayer();
         UUID pId = player.getUniqueId();
         SortNetwork network = null;
-        if (block.getType().equals(Material.SIGN_POST)) {
+        if (block.getType().equals(Material.WALL_SIGN)) {
             network = plugin.allNetworkBlocks.get(block);
             if (network == null) return;
             if (network.owner.equals(pId) || plugin.hasPermission(player, "autosort.override")) {
