@@ -295,7 +295,7 @@ public class AutoSortListener implements Listener {
 
         if (event.getBlock().getType().equals(Material.WALL_SIGN)) {
             Block signBlock = event.getBlock();
-            if (lines[0].startsWith("#")) { //TODO Withdraw Chest
+/*            if (lines[0].startsWith("#")) { //TODO Withdraw Chest
                 if (plugin.hasPermission(player, "autosort.use.withdraw")) {
                     String option = lines[3].toUpperCase();
                     Block storageBlock = getDirection("", signBlock);
@@ -340,7 +340,7 @@ public class AutoSortListener implements Listener {
                     event.setCancelled(true);
                     player.sendMessage(ChatColor.RED + "You do not have permission to create Withdraw chests.");
                 }
-            } else if (lines[0].startsWith("*")) {
+            } else*/ if (lines[0].startsWith("*")) {
                 if (plugin.hasPermission(player, "autosort.use.deposit")) {
                     String mat1 = lines[1].toUpperCase();
                     String mat2 = lines[2].toUpperCase();
