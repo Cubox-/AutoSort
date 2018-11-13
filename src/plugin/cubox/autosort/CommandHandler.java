@@ -107,7 +107,7 @@ class CommandHandler {
                 return;
             }
             reload(sender);
-        } else if (commandName.equalsIgnoreCase("addasgroup")) {
+/*        } else if (commandName.equalsIgnoreCase("addasgroup")) {
             if (!plugin.hasPermission(player, "autosort.addasgroup")) {
                 sender.sendMessage(ChatColor.RED + "Sorry you do not have permission for " + ChatColor.YELLOW + commandName + ChatColor.RED + " command.");
                 return;
@@ -198,7 +198,7 @@ class CommandHandler {
             } else {
                 sender.sendMessage(ChatColor.RED + "Incorrect command arguments");
                 sender.sendMessage("Try " + ChatColor.YELLOW + " /delasgroup <groupName>");
-            }
+            }*/
         } else if (commandName.equalsIgnoreCase("ascleanup")) {
             if (!plugin.hasPermission(player, "autosort.ascleanup")) {
                 sender.sendMessage(ChatColor.RED + "Sorry you do not have permission for " + ChatColor.YELLOW + commandName + ChatColor.RED + " command.");
@@ -546,7 +546,7 @@ class CommandHandler {
             } else {
                 sender.sendMessage(ChatColor.RED + "Too few arguments! Usage: /remfromnet [ownerName] [netName] [players...]");
             }
-        } else if (commandName.equalsIgnoreCase("addasgroup")) {
+/*        } else if (commandName.equalsIgnoreCase("addasgroup")) {
             if (args.length > 1) {
                 String groupName = args[0].toUpperCase();
                 List<Material> matList = new ArrayList<>();
@@ -604,7 +604,7 @@ class CommandHandler {
                 } else {
                     sender.sendMessage(ChatColor.RED + "That group does not exist!");
                 }
-            }
+            }*/
         } else if (commandName.equalsIgnoreCase("ascleanup")) {
             sender.sendMessage(ChatColor.BLUE + "Cleaning up all AutoSort networks...");
             if (!plugin.cleanupNetwork()) AutoSort.LOGGER.info("AutoSort: All networks are clean.");
