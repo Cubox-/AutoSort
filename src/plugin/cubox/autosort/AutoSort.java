@@ -13,7 +13,6 @@ import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
-import org.bukkit.plugin.PluginDescriptionFile;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitScheduler;
@@ -100,7 +99,7 @@ public class AutoSort extends JavaPlugin {
         }, 1);
 
         pm.registerEvents(asListener, this);
-        scheduler.scheduleSyncRepeatingTask(this, new SortTask(this), 5L, 10L);
+        scheduler.scheduleSyncRepeatingTask(this, new SortTask(this), 20*60L, 40L); // Start after a minute, every 2 seconds
         scheduler.scheduleSyncRepeatingTask(this, new CleanupTask(this), 12000L,
                 getConfig().getLong("save-network-rate", 1800) * 20 // Converts time to seconds, defaults to 30 minutes.
         );

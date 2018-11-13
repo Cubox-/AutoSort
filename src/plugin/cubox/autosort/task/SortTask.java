@@ -21,9 +21,8 @@ import java.util.Map.Entry;
 @SuppressWarnings("ConstantConditions")
 public class SortTask implements Runnable {
 
-    private boolean waitTime = false;
     private final AutoSort plugin;
-private long tick = 0;
+    private long tick = 0;
 
     public SortTask(AutoSort autoSort) {
         plugin = autoSort;
@@ -32,10 +31,6 @@ private long tick = 0;
     public void run() {
         if (!plugin.UUIDLoaded) return;
         long timer = System.currentTimeMillis();
-        long previousTime = 0;
-        if (waitTime && timer - previousTime > 5000) {
-            waitTime = false;
-        }
         try {
             for (List<SortNetwork> networks : plugin.networks.values())
                 // Deposit Chest Sort
