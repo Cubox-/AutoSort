@@ -114,12 +114,12 @@ class CommandHandler {
             }
             if (args.length > 1) {
                 String groupName = args[0].toUpperCase();
-                List<ItemStack> matList = new ArrayList<>();
+                List<Material> matList = new ArrayList<>();
                 List<String> ids = new ArrayList<>();
                 for (int i = 1; i < args.length; i++) {
                     String mat = args[i];
-                    if (Util.parseMaterialID(mat) != null) {
-                        matList.add(Util.parseMaterialID(mat));
+                    if (Util.parseMaterial(mat) != null) {
+                        matList.add(Util.parseMaterial(mat));
                         ids.add(mat);
                     } else {
                         sender.sendMessage(ChatColor.RED + "Invalid Material: " + mat);
@@ -134,7 +134,7 @@ class CommandHandler {
                 sender.sendMessage(ChatColor.RED + "Incorrect command arguments");
                 sender.sendMessage("Try " + ChatColor.YELLOW + " /addasgroup <groupName> <itemID>");
             }
-        /*} else if (commandName.equalsIgnoreCase("modasgroup")) {
+        } else if (commandName.equalsIgnoreCase("modasgroup")) {
             if (!plugin.hasPermission(player, "autosort.modasgroup")) {
                 sender.sendMessage(ChatColor.RED + "Sorry you do not have permission for " + ChatColor.YELLOW + commandName + ChatColor.RED + " command.");
                 return;
@@ -142,20 +142,20 @@ class CommandHandler {
             if (args.length > 1) {
                 String groupName = args[0].toUpperCase();
                 if (AutoSort.customMatGroups.containsKey(groupName)) {
-                    List<ItemStack> matList = AutoSort.customMatGroups.get(groupName);
+                    List<Material> matList = AutoSort.customMatGroups.get(groupName);
                     for (int i = 1; i < args.length; i++) {
                         String mat = args[i];
-                        if (Util.parseMaterialID(mat) != null) {
-                            matList.add(Util.parseMaterialID(mat));
+                        if (Util.parseMaterial(mat) != null) {
+                            matList.add(Util.parseMaterial(mat));
                         } else {
                             if (args[i].startsWith("-")) {
-                                Iterator<ItemStack> itms = matList.iterator();
+                                Iterator<Material> itms = matList.iterator();
                                 while (itms.hasNext()) {
-                                    ItemStack item = itms.next();
+                                    Material item = itms.next();
                                     String modArg = args[i].substring(1);
-                                    ItemStack parsedItem = Util.parseMaterialID(modArg);
+                                    Material parsedItem = Util.parseMaterial(modArg);
                                     if (parsedItem == null) continue;
-                                    if (item.getType() == parsedItem.getType() && item.getDurability() == parsedItem.getDurability())
+                                    if (item == parsedItem)
                                         itms.remove();
                                 }
                             } else {
@@ -164,11 +164,8 @@ class CommandHandler {
                         }
                     }
                     List<String> ids = new ArrayList<>();
-                    for (ItemStack is : matList) {
-                        if (is.getData().getData() == 0)
-                            ids.add("" + is.getTypeId());
-                        else
-                            ids.add(is.getTypeId() + ":" + is.getData().getData());
+                    for (Material is : matList) {
+                        ids.add(is.name());
                     }
                     ConfigurationSection groupsSec = plugin.getConfig().getConfigurationSection("customGroups");
                     groupsSec.set(groupName, ids);
@@ -181,7 +178,7 @@ class CommandHandler {
             } else {
                 sender.sendMessage(ChatColor.RED + "Incorrect command arguments");
                 sender.sendMessage("Try " + ChatColor.YELLOW + " /modasgroup <groupName>");
-            }*/
+            }
         } else if (commandName.equalsIgnoreCase("delasgroup")) {
             if (!plugin.hasPermission(player, "autosort.delasgroup")) {
                 sender.sendMessage(ChatColor.RED + "Sorry you do not have permission for " + ChatColor.YELLOW + commandName + ChatColor.RED + " command.");
@@ -329,7 +326,7 @@ class CommandHandler {
                 return;
             }
             sender.sendMessage(ChatColor.GOLD + "Custom AutoSort material groups:");
-            List<ItemStack> items;
+            List<Material> items;
             StringBuilder list;
             int count = 0;
             for (String groupName : AutoSort.customMatGroups.keySet()) {
@@ -339,8 +336,8 @@ class CommandHandler {
                 list.append(groupName);
                 list.append(ChatColor.GOLD);
                 list.append(": ");
-                for (ItemStack item : items) {
-                    list.append(getTrueMaterial(item));
+                for (Material item : items) {
+                    list.append(getMaterialName(item));
                     list.append(ChatColor.WHITE);
                     list.append(count == items.size() - 1 ? "" : ", ");
                     list.append(ChatColor.GOLD);
@@ -357,7 +354,7 @@ class CommandHandler {
             }
             boolean doList = false;
             SortNetwork network = null;
-            if (args.length == 1) { // /listasmembers <netName>
+            if (args.length == 1) { // /listasmembers <owner> <netName>
                 String owner = player.getName();
                 String netName = args[0];
                 if (netName.equalsIgnoreCase("$Public")) {
@@ -552,12 +549,12 @@ class CommandHandler {
         } else if (commandName.equalsIgnoreCase("addasgroup")) {
             if (args.length > 1) {
                 String groupName = args[0].toUpperCase();
-                List<ItemStack> matList = new ArrayList<>();
+                List<Material> matList = new ArrayList<>();
                 List<String> ids = new ArrayList<>();
                 for (int i = 1; i < args.length; i++) {
                     String mat = args[i];
-                    if (Util.parseMaterialID(mat) != null) {
-                        matList.add(Util.parseMaterialID(mat));
+                    if (Util.parseMaterial(mat) != null) {
+                        matList.add(Util.parseMaterial(mat));
                         ids.add(mat);
                     } else {
                         sender.sendMessage(ChatColor.RED + "Invalid Material: " + mat);
@@ -569,25 +566,22 @@ class CommandHandler {
                 AutoSort.customMatGroups.put(groupName, matList);
                 sender.sendMessage(ChatColor.GREEN + "AutoSort group added.");
             }
-        /*} else if (commandName.equalsIgnoreCase("modasgroup")) {
+        } else if (commandName.equalsIgnoreCase("modasgroup")) {
             if (args.length > 1) {
                 String groupName = args[0].toUpperCase();
                 if (AutoSort.customMatGroups.containsKey(groupName)) {
-                    List<ItemStack> matList = new ArrayList<>();
+                    List<Material> matList = new ArrayList<>();
                     for (int i = 1; i < args.length; i++) {
                         String mat = args[i];
-                        if (Util.parseMaterialID(mat) != null) {
-                            matList.add(Util.parseMaterialID(mat));
+                        if (Util.parseMaterial(mat) != null) {
+                            matList.add(Util.parseMaterial(mat));
                         } else {
                             sender.sendMessage(ChatColor.RED + "Invalid Material: " + mat);
                         }
                     }
                     List<String> ids = new ArrayList<>();
-                    for (ItemStack is : matList) {
-                        if (is.getData().getData() == 0)
-                            ids.add("" + is.getTypeId());
-                        else
-                            ids.add(is.getTypeId() + ":" + is.getData().getData());
+                    for (Material is : matList) {
+                        ids.add(is.name());
                     }
                     ConfigurationSection groupsSec = plugin.getConfig().getConfigurationSection("customGroups");
                     groupsSec.set(groupName, ids);
@@ -597,7 +591,7 @@ class CommandHandler {
                 } else {
                     sender.sendMessage(ChatColor.RED + "That group does not exist!");
                 }
-            }*/
+            }
         } else if (commandName.equalsIgnoreCase("delasgroup")) {
             if (args.length == 1) {
                 String groupName = args[0].toUpperCase();
@@ -617,7 +611,7 @@ class CommandHandler {
             sender.sendMessage(ChatColor.BLUE + "Done.");
         } else if (commandName.equalsIgnoreCase("listasgroups")) {
             sender.sendMessage(ChatColor.GOLD + "Custom AutoSort material groups:");
-            List<ItemStack> items;
+            List<Material> items;
             StringBuilder list;
             int count = 0;
             for (String groupName : AutoSort.customMatGroups.keySet()) {
@@ -627,8 +621,8 @@ class CommandHandler {
                 list.append(groupName);
                 list.append(ChatColor.GOLD);
                 list.append(": ");
-                for (ItemStack item : items) {
-                    list.append(getTrueMaterial(item));
+                for (Material item : items) {
+                    list.append(getMaterialName(item));
                     list.append(ChatColor.WHITE);
                     list.append(count == items.size() - 1 ? "" : ", ");
                     list.append(ChatColor.GOLD);
@@ -741,7 +735,7 @@ class CommandHandler {
             AutoSort.LOGGER.warning("We were passed a null ItemStack");
             return "null";
         }
-        return item.getType().name();
+        return item.name();
     }
 
     private void sortPlayerInventory(final int startIndex, final CommandSender sender, final String owner, final String netName, final SortNetwork net) {

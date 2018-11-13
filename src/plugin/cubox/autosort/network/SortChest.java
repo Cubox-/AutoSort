@@ -1,5 +1,6 @@
 package plugin.cubox.autosort.network;
 
+import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
@@ -19,23 +20,22 @@ public class SortChest {
     public final int priority;
     public final List<Material> matList;
 
-    public SortChest(Block block, Block sign, String signText, int priority, boolean disregardDamage) {
+    public SortChest(Block block, Block sign, String signText, int priority) {
         this.block = block;
         this.sign = sign;
         this.priority = priority;
         this.signText = signText;
         this.matList = parseMaterialIDList(signText);
-        this.disregardDamage = disregardDamage;
     }
 
-    private List<ItemStack> parseMaterialIDList(String str) {
+    private List<Material> parseMaterialIDList(String str) {
         String[] parts = str.split(",");
-        List<ItemStack> result = new ArrayList<>();
+        List<Material> result = new ArrayList<>();
         for (String id : parts) {
             if (AutoSort.customMatGroups.containsKey(id)) {
                 result.addAll(AutoSort.customMatGroups.get(id));
             } else {
-                result.add(Util.parseMaterialID(id));
+                result.add(Util.parseMaterial(id));
             }
         }
         return result;

@@ -1,9 +1,7 @@
 package plugin.cubox.autosort;
 
 import org.bukkit.*;
-import org.bukkit.block.Block;
-import org.bukkit.block.BlockFace;
-import org.bukkit.block.BlockState;
+import org.bukkit.block.*;
 import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
@@ -45,14 +43,14 @@ public class Util {
         return null;
     }
 
-    public static ItemStack parseMaterialID(String str) {
+    public static Material parseMaterial(String str) {
         if (str != null) {
             if (str.equalsIgnoreCase("MISC")) {
-                return new ItemStack(Material.AIR);
+                return Material.AIR;
             } else {
                 Material mat = Material.matchMaterial(str);
                 if (mat != null) {
-                    return new ItemStack(mat, 1);
+                    return mat;
                 } else {
                     AutoSort.LOGGER.warning("We tried to give Material.matchMaterial " + str + " but it returned null.");
                     return null;
@@ -141,11 +139,19 @@ public class Util {
 
     public Block doubleChest(Block block) {
         if (block.getType().equals(Material.CHEST) || block.getType().equals(Material.TRAPPED_CHEST)) {
-            BlockFace[] surchest = {BlockFace.NORTH, BlockFace.EAST, BlockFace.SOUTH, BlockFace.WEST};
-            for (BlockFace face : surchest) {
-                Block otherHalf = block.getRelative(face);
-                if (otherHalf.getType().equals(block.getType())) {
-                    return otherHalf;
+            Chest chest = (Chest)block.getState();
+            InventoryHolder chestHolder = chest.getInventory().getHolder();
+            if (chestHolder instanceof DoubleChest) {
+                DoubleChest doublechest = (DoubleChest) chestHolder;
+                Chest left = (Chest)doublechest.getLeftSide();
+                Chest right = (Chest)doublechest.getRightSide();
+
+                if (right.equals(chest)) {
+                    return left.getBlock();
+                } else if (left.equals(chest)) {
+                    return right.getBlock();
+                } else {
+                    AutoSort.LOGGER.severe("We failed to find the right DoubleChest for the chest. It's not possible.");
                 }
             }
         }

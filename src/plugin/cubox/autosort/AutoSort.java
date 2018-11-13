@@ -13,7 +13,6 @@ import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.PluginDescriptionFile;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -51,10 +50,9 @@ public class AutoSort extends JavaPlugin {
     public static boolean ONLINE_UUID_CHECK = true;
     public static int httpConnectTimeout = 15000;
     public static int httpReadTimeout = 15000;
-    public static ConcurrentHashMap<String, List<ItemStack>> customMatGroups = new ConcurrentHashMap<>();
-    public static Map<UUID, ProxExcep> proximities = new HashMap<>();
+    public static final ConcurrentHashMap<String, List<Material>> customMatGroups = new ConcurrentHashMap<>();
+    public static final Map<UUID, ProxExcep> proximities = new HashMap<>();
     public static int defaultProx = 0;
-    public static boolean bkError = false;
     public static boolean emptiesFirst = true;
     public static boolean keepPriority = false;
     private static int debug = 0;
@@ -193,9 +191,9 @@ public class AutoSort extends JavaPlugin {
         Map<String, Object> groups = groupSec.getValues(false);
         for (String key : groups.keySet()) {
             List<String> idList = groupSec.getStringList(key);
-            List<ItemStack> matList = new ArrayList<>();
+            List<Material> matList = new ArrayList<>();
             for (String id : idList) {
-                ItemStack is = Util.parseMaterialID(id);
+                Material is = Util.parseMaterial(id);
                 if (is == null) {
                     continue;
                 }
@@ -334,9 +332,7 @@ public class AutoSort extends JavaPlugin {
 
                                         int priority = cSec.getInt("Priority");
 
-                                        boolean disregardDamage = cSec.getBoolean("DisregardDamage");
-
-                                        net.sortChests.add(new SortChest(chest, sign, signText, priority, disregardDamage));
+                                        net.sortChests.add(new SortChest(chest, sign, signText, priority));
                                         allNetworkBlocks.put(chest, net);
                                         allNetworkBlocks.put(util.doubleChest(chest), net);
                                         allNetworkBlocks.put(sign, net);
@@ -498,9 +494,8 @@ public class AutoSort extends JavaPlugin {
 
                                 int priority = cSec.getInt("Priority");
 
-                                boolean disregardDamage = cSec.getBoolean("DisregardDamage");
 
-                                net.sortChests.add(new SortChest(chest, sign, signText, priority, disregardDamage));
+                                net.sortChests.add(new SortChest(chest, sign, signText, priority));
                                 allNetworkBlocks.put(chest, net);
                                 allNetworkBlocks.put(util.doubleChest(chest), net);
                                 allNetworkBlocks.put(sign, net);
@@ -798,7 +793,6 @@ public class AutoSort extends JavaPlugin {
                     cSec.set("Sign", signLocStr);
                     cSec.set("SignText", chest.signText);
                     cSec.set("Priority", chest.priority);
-                    cSec.set("DisregardDamage", chest.disregardDamage);
                 }
 
                 // Save Deposit Chests

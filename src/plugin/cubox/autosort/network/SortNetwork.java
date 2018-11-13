@@ -67,7 +67,7 @@ public class SortNetwork {
         for (int priority = 1; priority <= minPriority; priority++) {
             for (SortChest chest : sortChests) {
                 if (chest.priority == priority) {
-                    for (ItemStack mat : chest.matList) {
+                    for (Material mat : chest.matList) {
                         if (mat == null) {
                             AutoSort.LOGGER.warning("----------------------------");
                             AutoSort.LOGGER.warning("The material group for chest at:");
@@ -78,22 +78,8 @@ public class SortNetwork {
                             AutoSort.LOGGER.warning("----------------------------");
                             continue;
                         }
-                        boolean ignoreData = true;
-                        if (AutoSort.customMatGroups.containsKey(chest.signText)) {
-                            for (ItemStack i : AutoSort.customMatGroups.get(chest.signText)) {
-                                if (i != null && i.getDurability() > 0) {
-                                    ignoreData = false;
-                                }
-                            }
-                        }
-                        if (chest.disregardDamage && ignoreData) {
-                            if (mat.getType().equals(item.getType())) {
-                                if (moveItemToChest(item, chest)) return true;
-                            }
-                        } else {
-                            if (mat.getType().equals(item.getType()) && mat.getData().equals(item.getData())) {
-                                if (moveItemToChest(item, chest)) return true;
-                            }
+                        if (mat.equals(item.getType())) {
+                            if (moveItemToChest(item, chest)) return true;
                         }
                     }
                 }
@@ -101,7 +87,7 @@ public class SortNetwork {
             for (SortChest chest : sortChests) { // Sorts MISC items into MISC group. References to Material AIR are used for MISC in mat group
                 if (chest.priority == priority) {
                     if (chest.matList.get(0) == null) continue;
-                    if (chest.matList.size() == 1 && chest.matList.get(0).getType().equals(Material.AIR)) {
+                    if (chest.matList.size() == 1 && chest.matList.get(0).equals(Material.AIR)) {
                         if (moveItemToChest(item, chest)) return true;
                     }
                 }
