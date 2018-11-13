@@ -37,7 +37,7 @@ commands:
   addtonet:
     description: Add players to an AutoSort network
     permission: autosort.addtonet
-    usage: /addtonet [netName] [players...]
+    usage: /addtonet [Owner] [netName] [players...]
   listasgroups:
     description: List all AutoSort material groups defined on this server
     permission: autosort.listasgroups
@@ -49,7 +49,7 @@ commands:
   remfromnet:
     description: Removes players from a AutoSort network
     permission: autosort.remfromnet
-    usage: /remfromnet [netName] [players...]
+    usage: /remfromnet [Owner] [netName] [players...]
   asremnet:
     description: Removes a network 
     permission: autosort.remnet

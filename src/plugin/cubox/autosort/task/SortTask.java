@@ -21,8 +21,8 @@ import java.util.Map.Entry;
 @SuppressWarnings("ConstantConditions")
 public class SortTask implements Runnable {
 
-    boolean waitTime = false;
-    private AutoSort plugin;
+    private boolean waitTime = false;
+    private final AutoSort plugin;
 private long tick = 0;
 
     public SortTask(AutoSort autoSort) {

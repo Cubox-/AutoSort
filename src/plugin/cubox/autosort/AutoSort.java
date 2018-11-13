@@ -45,7 +45,7 @@ import java.util.logging.Logger;
 @SuppressWarnings("ConstantConditions")
 public class AutoSort extends JavaPlugin {
 
-    public static final int SAVEVERSION = 6;
+    private static final int SAVEVERSION = 6;
     public static final Logger LOGGER = Logger.getLogger("Minecraft.AutoSort");
     public static String PROFILE_URL = "https://api.mojang.com/profiles/minecraft";
     public static boolean ONLINE_UUID_CHECK = true;
@@ -58,13 +58,13 @@ public class AutoSort extends JavaPlugin {
     public static boolean emptiesFirst = true;
     public static boolean keepPriority = false;
     private static int debug = 0;
-    public List<Item> items = new ArrayList<>();
-    public List<Item> stillItems = new ArrayList<>();
-    public ConcurrentHashMap<Block, SortNetwork> allNetworkBlocks = new ConcurrentHashMap<>();
-    public ConcurrentHashMap<UUID, List<SortNetwork>> networks = new ConcurrentHashMap<>();
-    public Map<Material, Material> sortBlocks = new HashMap<>();
-    public Map<Material, Material> depositBlocks = new HashMap<>();
-    public Map<Material, Material> withdrawBlocks = new HashMap<>();
+    public final List<Item> items = new ArrayList<>();
+    public final List<Item> stillItems = new ArrayList<>();
+    public final ConcurrentHashMap<Block, SortNetwork> allNetworkBlocks = new ConcurrentHashMap<>();
+    public final ConcurrentHashMap<UUID, List<SortNetwork>> networks = new ConcurrentHashMap<>();
+    public final Map<Material, Material> sortBlocks = new HashMap<>();
+    public final Map<Material, Material> depositBlocks = new HashMap<>();
+    public final Map<Material, Material> withdrawBlocks = new HashMap<>();
     public boolean UUIDLoaded = false;
     public boolean worldRestrict = false;
     public AutoSortListener asListener;
@@ -72,7 +72,7 @@ public class AutoSort extends JavaPlugin {
     private boolean uuidprecache = false;
     private Server server;
     private BukkitScheduler scheduler;
-private String pluginName;
+    private String pluginName;
     private FileConfiguration customConfig = null;
     private File customConfigFile = null;
     private CommandHandler commandHandler;
@@ -124,12 +124,6 @@ private String pluginName;
             scheduler.runTaskAsynchronously(this, () -> commandHandler.inConsole(sender, cmd, commandLabel, args));
             return true;
         }
-    }
-
-    public boolean canAccessProtection(Player player, Block block) {
-        return true;
-        // The 'com.griefcraft.lwc.LWC' package has been removed from
-        // the project so it will always be null, ie. true.
     }
 
     public boolean hasPermission(Player player, String permission) {
@@ -211,7 +205,7 @@ private String pluginName;
         }
     }
 
-    public void refreshInternalConfig() {
+    private void refreshInternalConfig() {
         try {
             getConfig().load(new File(this.getDataFolder(), "config.yml"));
         } catch (Exception e) {
@@ -847,7 +841,7 @@ private String pluginName;
         saveCustomConfig();
     }
 
-    public void reloadCustomConfig() {
+    private void reloadCustomConfig() {
         if (customConfigFile == null) {
             customConfigFile = new File(getDataFolder(), "networks.yml");
         }
@@ -862,14 +856,14 @@ private String pluginName;
         }
     }
 
-    public FileConfiguration getCustomConfig() {
+    private FileConfiguration getCustomConfig() {
         if (customConfig == null) {
             reloadCustomConfig();
         }
         return customConfig;
     }
 
-    public void saveCustomConfig() {
+    private void saveCustomConfig() {
         if (customConfig == null || customConfigFile == null) {
             return;
         }

@@ -3,7 +3,7 @@ Profile_URL: https://api.mojang.com/profiles/minecraft
 online_UUID_Check: true
 HTTPConnectTimeout: 15000
 HTTPReadTimeout: 15000
-worldRestrict: false
+worldRestrict: true
 fill-emptier-first: false
 keep-priority-sorted: false
 proximity: 0
@@ -68,7 +68,7 @@ customGroups:
   - sand
   - red_sand
   - sandstone
-  - chisled_sandstone
+  - chiseled_sandstone
   - cut_sandstone
   - white_stained_glass
   - orange_stained_glass
@@ -210,7 +210,7 @@ customGroups:
   - brewing_stand
   - cauldron
   - ender_eye
-  - speckled_melon
+  - glistering_melon_slice
   - experience_bottle
   - fire_charge
   - writable_book
@@ -289,7 +289,7 @@ customGroups:
   - fishing_rod
   - clock
   - shears
-  - carrot_stick
+  - carrot_on_a_stick
   - shield
   - elytra
   - spruce_boat
@@ -309,7 +309,7 @@ customGroups:
   - enchanted_golden_apple
   - cod
   - salmon
-  - clownfish
+  - tropical_fish
   - pufferfish
   - cooked_cod
   - cooked_salmon
@@ -340,7 +340,7 @@ customGroups:
   - cactus
   - sugar_cane
   - carved_pumpkin
-  - melon_block
+  - melon
   - lily_pad
   - cocoa
   - carrots
@@ -429,7 +429,6 @@ customGroups:
   - stone_bricks
   - mossy_stone_bricks
   - cracked_stone_bricks
-  - chiseled_bricks
   - iron_bars
   - glass_pane
   - oak_fence_gate

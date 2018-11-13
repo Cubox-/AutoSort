@@ -5,8 +5,8 @@ import plugin.cubox.autosort.AutoSort;
 
 public class CleanupTask implements Runnable {
 
-    private AutoSort plugin;
-    private Server server;
+    private final AutoSort plugin;
+    private final Server server;
 
     public CleanupTask(AutoSort autoSort) {
         plugin = autoSort;

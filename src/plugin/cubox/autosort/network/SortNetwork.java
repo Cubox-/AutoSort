@@ -30,21 +30,16 @@ public class SortNetwork {
      *      Hopper
      */
 
-    public UUID owner = null;
+    public final UUID owner;
     public List<UUID> members = new ArrayList<>();
-    public String netName = "";
-    public String world = "";
+    public final String netName;
+    public String world;
 
-    public List<SortChest> sortChests = new ArrayList<>();
-    public Map<Block, NetworkItem> depositChests = new HashMap<>();
-    public Map<Block, NetworkItem> withdrawChests = new HashMap<>();
-    public Map<Block, NetworkItem> dropSigns = new HashMap<>();
+    public final List<SortChest> sortChests = new ArrayList<>();
+    public final Map<Block, NetworkItem> depositChests = new HashMap<>();
+    public final Map<Block, NetworkItem> withdrawChests = new HashMap<>();
+    public final Map<Block, NetworkItem> dropSigns = new HashMap<>();
 
-    /**
-     * @param owner
-     * @param netName
-     * @param world
-     */
     public SortNetwork(UUID owner, String netName, String world) {
         this.owner = owner;
         this.netName = netName;
@@ -137,11 +132,11 @@ public class SortNetwork {
         return false;
     }
 
-    public class amountComparator implements Comparator<Object> {
+    class amountComparator implements Comparator<Object> {
 
-        private ItemStack item;
+        private final ItemStack item;
 
-        public amountComparator(ItemStack item) {
+        amountComparator(ItemStack item) {
             this.item = item;
         }
 

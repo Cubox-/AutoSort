@@ -82,12 +82,7 @@ public class Util {
         if (state instanceof InventoryHolder)
             return ((InventoryHolder) state).getInventory();
         else
-            return tryNMSInventory(block);
-    }
-
-    @SuppressWarnings("unused")
-    private static Inventory tryNMSInventory(Block block) {
-        return null;
+            return null;
     }
 
     public boolean isValidInventoryBlock(Block block) {
@@ -160,13 +155,13 @@ public class Util {
     // Roll through the network and pull out the correct amount of resources.
     // If not enough space return a false
     // true is successful
-    public boolean makeWithdraw(Player player, CustomPlayer settings) {
+    @SuppressWarnings({"UnusedReturnValue", "unused"})
+    private boolean makeWithdraw(Player player, CustomPlayer settings) {
         int wantedAmount = settings.wantedAmount;
         ItemStack wantedItem = settings.inventory.get(settings.currentItemIdx).item;
         Map<Integer, ItemStack> couldntFit = null;
         Inventory networkInv;
         for (SortChest chest : settings.sortNetwork.sortChests) {
-            //if (chest.signText.contains("LAVAFURNACE")) continue; // TODO Lavafurnace block
             if (!chest.block.getChunk().isLoaded())
                 chest.block.getChunk().load();
             networkInv = getInventory(chest.block);
@@ -264,9 +259,8 @@ public class Util {
         return tooManyItems;
     }
 
-    public boolean updateInventoryList(Player player, CustomPlayer settings) {
+    public boolean updateInventoryList(@SuppressWarnings("unused") Player player, CustomPlayer settings) {
         for (SortChest chest : settings.sortNetwork.sortChests) {
-            //if (chest.signText.contains("LAVAFURNACE")) continue; //TODO lavafurnace block
             Inventory inv = Util.getInventory(chest.block);
             if (inv == null) continue;
             for (ItemStack item : inv) {

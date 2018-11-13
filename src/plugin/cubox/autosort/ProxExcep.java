@@ -2,17 +2,12 @@ package plugin.cubox.autosort;
 
 import java.util.UUID;
 
-public class ProxExcep {
+class ProxExcep {
 
-    String network;
-    private UUID owner;
-    private int distance;
+    private final String network;
+    private final UUID owner;
+    private final int distance;
 
-    /**
-     * @param owner
-     * @param network
-     * @param distance
-     */
     public ProxExcep(UUID owner, String network, int distance) {
         this.owner = owner;
         this.network = network;

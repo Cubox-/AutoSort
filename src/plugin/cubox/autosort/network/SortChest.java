@@ -13,12 +13,11 @@ import java.util.Map;
 
 public class SortChest {
 
-    public Block block;
-    public Block sign;
-    public String signText = "";
-    public int priority;
-    public List<ItemStack> matList;
-    public boolean disregardDamage;
+    public final Block block;
+    public final Block sign;
+    public final String signText;
+    public final int priority;
+    public final List<Material> matList;
 
     public SortChest(Block block, Block sign, String signText, int priority, boolean disregardDamage) {
         this.block = block;

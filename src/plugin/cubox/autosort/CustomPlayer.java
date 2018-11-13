@@ -13,7 +13,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public class CustomPlayer {
 
-    public static ConcurrentHashMap<String, CustomPlayer> playerSettings = new ConcurrentHashMap<>();
+    public static final ConcurrentHashMap<String, CustomPlayer> playerSettings = new ConcurrentHashMap<>();
     public int startItemIdx = 0; // Current Start index for chest withdraw
     public int currentItemIdx = 0; // Current item to start a chest withdraw on.
     public int wantedAmount = 1; // Current amount for a withdraw
@@ -22,7 +22,7 @@ public class CustomPlayer {
     public String playerName = ""; // The players name
     public Block block = null; // The withdraw chest block
     public Inventory withdrawInventory = null; // The inventory for withdrawing
-    public List<InventoryItem> inventory = new ArrayList<>(400); // Full inventory of this network
+    public final List<InventoryItem> inventory = new ArrayList<>(400); // Full inventory of this network
     public SortNetwork sortNetwork = null;
 
     public static CustomPlayer getSettings(Player player) {

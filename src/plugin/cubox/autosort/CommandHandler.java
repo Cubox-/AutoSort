@@ -20,20 +20,20 @@ import plugin.cubox.autosort.network.SortNetwork;
 
 import java.util.*;
 import java.util.Map.Entry;
-import java.util.logging.Logger;
 
 @SuppressWarnings({"ConstantConditions", "BooleanMethodIsAlwaysInverted", "UnusedReturnValue", "SameReturnValue"})
-public class CommandHandler {
+class CommandHandler {
 
-    private AutoSort plugin;
-    private BukkitScheduler scheduler;
+    private final AutoSort plugin;
+    private final BukkitScheduler scheduler;
 
     public CommandHandler(AutoSort plugin) {
         this.plugin = plugin;
         scheduler = plugin.getServer().getScheduler();
     }
 
-    public void inGame(CommandSender sender, Command cmd, String commandLabel, String[] args) {
+    @SuppressWarnings("SuspiciousMethodCalls")
+    public void inGame(CommandSender sender, Command cmd, @SuppressWarnings("unused") String commandLabel, String[] args) {
         String commandName = cmd.getName();
         Player player = (Player) sender;
         UUID ownerUUID = player.getUniqueId();
@@ -442,7 +442,6 @@ public class CommandHandler {
         } else {
             sender.sendMessage(ChatColor.RED + "Incorrect command arguments");
             sender.sendMessage("Try " + ChatColor.YELLOW + " /aswithdraw <networkName>");
-            return;
         }
     }
 
@@ -486,7 +485,7 @@ public class CommandHandler {
         }, 0);
     }
 
-    public void inConsole(CommandSender sender, Command cmd, String commandLabel, String[] args) {
+    public void inConsole(CommandSender sender, Command cmd, @SuppressWarnings("unused") String commandLabel, String[] args) {
         String commandName = cmd.getName();
         if (commandName.equalsIgnoreCase("asreload")) {
             if (args.length == 0) {
@@ -531,7 +530,6 @@ public class CommandHandler {
                 UUID ownerId = getPlayerUUID(args[0], sender);
                 if (ownerId == null) return;
                 SortNetwork net = plugin.findNetwork(ownerId, netName);
-                net = plugin.findNetwork(ownerId, netName);
                 if (net != null) {
                     int count = 0;
                     for (int i = 2; i < args.length; i++) {
@@ -738,7 +736,7 @@ public class CommandHandler {
         });
     }
 
-    private String getTrueMaterial(ItemStack item) {
+    private String getMaterialName(Material item) {
         if (item == null) {
             AutoSort.LOGGER.warning("We were passed a null ItemStack");
             return "null";

@@ -38,10 +38,9 @@ import java.util.concurrent.ConcurrentHashMap;
 @SuppressWarnings({"BooleanMethodIsAlwaysInverted", "UnnecessaryReturnStatement", "ConstantConditions"})
 public class AutoSortListener implements Listener {
 
-    public ConcurrentHashMap<String, SortNetwork> chestLock = new ConcurrentHashMap<>();
-    private AutoSort plugin;
+    public final ConcurrentHashMap<String, SortNetwork> chestLock = new ConcurrentHashMap<>();
+    private final AutoSort plugin;
 
-    @SuppressWarnings("unused")
     public AutoSortListener(AutoSort autoSort) {
         plugin = autoSort;
     }
@@ -105,7 +104,6 @@ public class AutoSortListener implements Listener {
         plugin.items.add(item);
     }
 
-    @SuppressWarnings("unused")
     @EventHandler(priority = EventPriority.LOWEST)
     public void onInventoryClose(InventoryCloseEvent event) {
         if (!(event.getPlayer() instanceof Player)) return;
@@ -114,16 +112,15 @@ public class AutoSortListener implements Listener {
         plugin.util.restoreWithdrawnInv(settings, player);
     }
 
-    @SuppressWarnings("unused")
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onInventoryOpen(InventoryOpenEvent event) {
         if (event.isCancelled()) return;
         InventoryHolder holder = event.getInventory().getHolder();
         Block block = null;
-        Block lChest = null;
-        Block rChest = null;
+        Block lChest;
+        Block rChest;
         SortNetwork sortNetwork = null;
-        Player player = null;
+        Player player;
         if (event.getPlayer() instanceof Player)
             player = (Player) event.getPlayer();
         else
@@ -240,22 +237,20 @@ public class AutoSortListener implements Listener {
         }
     }
 
-    @SuppressWarnings("unused")
     @EventHandler(priority = EventPriority.LOWEST)
     public void onPlayerLogin(PlayerLoginEvent event) {
         Player player = event.getPlayer();
-        String playerName = "";
+        String playerName;
         CustomPlayer settings = CustomPlayer.getSettings(player);
         playerName = settings.playerName;
         chestLock.remove(playerName);
         settings.clearPlayer();
     }
 
-    @SuppressWarnings("unused")
     @EventHandler(priority = EventPriority.LOWEST)
     public void onPlayerQuit(PlayerQuitEvent event) {
         Player player = event.getPlayer();
-        String playerName = "";
+        String playerName;
         CustomPlayer settings = CustomPlayer.getSettings(player);
         playerName = settings.playerName;
         if (!Objects.equals(playerName, "")) {
@@ -310,7 +305,7 @@ public class AutoSortListener implements Listener {
                     }
                     if (plugin.util.isValidWithdrawBlock(player, storageBlock, true) && plugin.canAccessProtection(player, storageBlock) && !isInNetwork(player, storageBlock) && storageBlock.getState() instanceof InventoryHolder) {
                         if (!plugin.worldRestrict || sortNetwork.world.equalsIgnoreCase(signBlock.getWorld().getName().toLowerCase())) {
-                            int prox = getProximity(player.getUniqueId(), netName);
+                            int prox = getProximity(player.getUniqueId());
                             Location origin = getOrigin(sortNetwork.sortChests);
                             Location here = storageBlock.getLocation();
                             if (prox == 0 || (origin != null && origin.distance(here) <= prox) || plugin.hasPermission(player, "autosort.ignoreproximity")) {
@@ -384,7 +379,7 @@ public class AutoSortListener implements Listener {
                     if (mat.equalsIgnoreCase("")) { //TODO Deposit Chest
                         if (plugin.util.isValidDepositBlock(player, storageBlock, true) && plugin.canAccessProtection(player, storageBlock) && !isInNetwork(player, storageBlock)) {
                             if (!plugin.worldRestrict || sortNetwork.world.equalsIgnoreCase(signBlock.getWorld().getName().toLowerCase())) {
-                                int prox = getProximity(player.getUniqueId(), netName);
+                                int prox = getProximity(player.getUniqueId());
                                 Location origin = getOrigin(sortNetwork.sortChests);
                                 Location here = storageBlock.getLocation();
                                 if (prox == 0 || (origin != null && origin.distance(here) <= prox) || plugin.hasPermission(player, "autosort.ignoreproximity")) {
@@ -416,12 +411,10 @@ public class AutoSortListener implements Listener {
                                 return;
                             }
                         }
-                        if (plugin.util.isValidInventoryBlock(player, storageBlock, true) && plugin.canAccessProtection(player, storageBlock) && !isInNetwork(player, storageBlock)) {
-                            boolean dd = !mat.contains(":");
-
+                        if (plugin.util.isValidInventoryBlock(player, storageBlock, true) && !isInNetwork(player, storageBlock)) {
                             if (plugin.hasPermission(player, "autosort.override") || sortNetwork.owner.equals(player.getUniqueId())) {
                                 if (!plugin.worldRestrict || sortNetwork.world.equalsIgnoreCase(signBlock.getWorld().getName().toLowerCase())) {
-                                    int prox = getProximity(player.getUniqueId(), netName);
+                                    int prox = getProximity(player.getUniqueId());
                                     Location origin = getOrigin(sortNetwork.sortChests);
                                     Location here = storageBlock.getLocation();
                                     if (prox == 0 || (origin != null && origin.distance(here) <= prox) || plugin.hasPermission(player, "autosort.ignoreproximity")) {
@@ -517,15 +510,14 @@ public class AutoSortListener implements Listener {
         }
     }
 
-    @SuppressWarnings("unused")
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onBlockBreak(BlockBreakEvent event) {
         if (event.isCancelled()) return;
         Block block = event.getBlock();
-        Sign sign = null;
+        Sign sign;
         Player player = event.getPlayer();
         UUID pId = player.getUniqueId();
-        SortNetwork network = null;
+        SortNetwork network;
         if (block.getType().equals(Material.WALL_SIGN)) {
             network = plugin.allNetworkBlocks.get(block);
             if (network == null) return;
@@ -929,7 +921,7 @@ public class AutoSortListener implements Listener {
             return false;
     }
 
-    private int getProximity(UUID owner, String netName) {
+    private int getProximity(UUID owner) {
         if (AutoSort.proximities.containsKey(owner)) {
             return AutoSort.proximities.get(owner).getDistance();
         } else {

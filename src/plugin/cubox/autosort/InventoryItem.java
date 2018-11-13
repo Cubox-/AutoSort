@@ -2,9 +2,9 @@ package plugin.cubox.autosort;
 
 import org.bukkit.inventory.ItemStack;
 
-public class InventoryItem {
+class InventoryItem {
 
-    public ItemStack item;
+    public final ItemStack item;
     public int amount;
 
     public InventoryItem(ItemStack item, int amount) {

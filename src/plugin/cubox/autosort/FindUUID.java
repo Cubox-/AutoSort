@@ -13,11 +13,11 @@ import java.net.URL;
 import java.util.UUID;
 import java.util.concurrent.Callable;
 
-public class FindUUID implements Callable<UUID> {
+class FindUUID implements Callable<UUID> {
 
     private final String name;
 
-    public FindUUID(String name) {
+    private FindUUID(String name) {
         this.name = name;
     }
 

@@ -4,11 +4,10 @@ import org.bukkit.block.Block;
 
 public class NetworkItem {
 
-    public SortNetwork network = null;
-    public Block chest;
-    public Block sign;
+    public final SortNetwork network;
+    public final Block chest;
+    public final Block sign;
 
-    @SuppressWarnings("unused")
     public NetworkItem(SortNetwork network, Block chest, Block sign) {
         this.network = network;
         this.chest = chest;

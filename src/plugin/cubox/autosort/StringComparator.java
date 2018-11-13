@@ -3,7 +3,7 @@ package plugin.cubox.autosort;
 import java.util.Comparator;
 
 
-public class StringComparator implements Comparator<Object> {
+class StringComparator implements Comparator<Object> {
 
     /*
      * Should Sort the items into alphabetical order
