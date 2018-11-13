@@ -480,3 +480,7 @@ customGroups:
   - jungle_door
   - acacia_door
   - dark_oak_door
+  KELP:
+  - kelp
+  - dried_kelp
+  - dried_kelp_block
