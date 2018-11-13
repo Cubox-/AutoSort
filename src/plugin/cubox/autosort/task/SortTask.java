@@ -37,38 +37,6 @@ private long tick = 0;
             waitTime = false;
         }
         try {
-            for (Item item : plugin.items) { // Deposit Signs Sort
-                if (item.getVelocity().equals(new Vector(0, 0, 0))) {
-                    plugin.stillItems.add(item);
-                    World world = item.getWorld();
-                    Block dropSpot = world.getBlockAt(item.getLocation());
-                    BlockFace[] surrounding = {BlockFace.SELF, BlockFace.NORTH, BlockFace.NORTH_EAST, BlockFace.EAST, BlockFace.SOUTH_EAST, BlockFace.SOUTH, BlockFace.SOUTH_WEST, BlockFace.WEST, BlockFace.NORTH_WEST};
-                    Block hopper;
-                    for (BlockFace face : surrounding) {
-                        hopper = dropSpot.getRelative(BlockFace.DOWN);
-                        if (hopper.getType().equals(Material.HOPPER)) {
-                            break;
-                        } else if (hopper.getRelative(face).getType().equals(Material.HOPPER)) {
-                            break;
-                        }
-                        if (dropSpot.getRelative(face).getType().equals(Material.WALL_SIGN)) {
-                            Sign sign = (Sign) dropSpot.getRelative(face).getState();
-                            sortDropSign(item, sign);
-                            break;
-                        }
-                    }
-                }
-            }
-            for (Item item : plugin.stillItems) {
-                plugin.items.remove(item);
-            }
-            plugin.stillItems.clear();
-
-        } catch (Exception e) {
-            AutoSort.LOGGER.warning("Error in Drop Sign Sort Thread");
-            e.printStackTrace();
-        }
-        try {
             for (List<SortNetwork> networks : plugin.networks.values())
                 // Deposit Chest Sort
                 for (SortNetwork net : networks)
@@ -135,16 +103,6 @@ private long tick = 0;
             if (tick != (System.currentTimeMillis() - timer)) {
                 tick = (System.currentTimeMillis() - timer);
                 System.out.println("Sort Time = " + tick + "ms");
-            }
-        }
-    }
-
-    private void sortDropSign(Item item, Sign sign) {
-        if (sign.getLine(0).startsWith("*")) {
-            SortNetwork net = plugin.allNetworkBlocks.get(sign.getBlock());
-            if (net == null) return;
-            if (net.sortItem(item.getItemStack())) {
-                item.remove();
             }
         }
     }
