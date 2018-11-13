@@ -11,7 +11,6 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
-import org.bukkit.event.block.BlockPhysicsEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.block.SignChangeEvent;
 import org.bukkit.event.entity.ItemSpawnEvent;
@@ -38,10 +37,10 @@ import java.util.concurrent.ConcurrentHashMap;
 @SuppressWarnings({"BooleanMethodIsAlwaysInverted", "UnnecessaryReturnStatement", "ConstantConditions"})
 public class AutoSortListener implements Listener {
 
-    public final ConcurrentHashMap<String, SortNetwork> chestLock = new ConcurrentHashMap<>();
+    final ConcurrentHashMap<String, SortNetwork> chestLock = new ConcurrentHashMap<>();
     private final AutoSort plugin;
 
-    public AutoSortListener(AutoSort autoSort) {
+    AutoSortListener(AutoSort autoSort) {
         plugin = autoSort;
     }
 
@@ -471,7 +470,7 @@ public class AutoSortListener implements Listener {
         }
     }
 
-    @EventHandler(priority = EventPriority.HIGHEST)
+/*    @EventHandler(priority = EventPriority.HIGHEST)
     public void onBlockPhysics(BlockPhysicsEvent event) {
         if (event.isCancelled()) return;
         Block block = event.getBlock();
@@ -483,7 +482,7 @@ public class AutoSortListener implements Listener {
                 }
             }
         }
-    }
+    }*/
 
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onBlockBreak(BlockBreakEvent event) {

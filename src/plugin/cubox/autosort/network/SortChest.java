@@ -25,10 +25,10 @@ public class SortChest {
         this.sign = sign;
         this.priority = priority;
         this.signText = signText;
-        this.matList = parseMaterialIDList(signText);
+        this.matList = parseMaterialList(signText);
     }
 
-    private List<Material> parseMaterialIDList(String str) {
+    private List<Material> parseMaterialList(String str) {
         String[] parts = str.split(",");
         List<Material> result = new ArrayList<>();
         for (String id : parts) {

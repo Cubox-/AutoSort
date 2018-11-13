@@ -65,7 +65,7 @@ private long tick = 0;
             plugin.stillItems.clear();
 
         } catch (Exception e) {
-            AutoSort.LOGGER.warning("[AutoSort] Error in Drop Sign Sort Thread");
+            AutoSort.LOGGER.warning("Error in Drop Sign Sort Thread");
             e.printStackTrace();
         }
         try {
@@ -105,7 +105,6 @@ private long tick = 0;
                             for (SortChest chest : net.sortChests) {
                                 if (chest.block.getChunk().isLoaded()) {
                                     if (chest.priority == i && plugin.util.isValidInventoryBlock(chest.block)) {
-                                        if (chest.signText.contains("LAVAFURNACE")) continue;
                                         Inventory inv = Util.getInventory(chest.block);
                                         if (inv != null) {
                                             ItemStack[] items = inv.getContents();

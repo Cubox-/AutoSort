@@ -109,7 +109,7 @@ public class SortNetwork {
                         }
                     }
                 } catch (Exception e) {
-                    AutoSort.LOGGER.warning("[AutoSort] Error occured moving item to chest. " + chest.block.getLocation());
+                    AutoSort.LOGGER.warning("Error occured moving item to chest. " + chest.block.getLocation());
                     e.printStackTrace();
                     return false;
                 }
